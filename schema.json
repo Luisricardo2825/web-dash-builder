@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "src": {
+      "type": "string",
+      "title": "Source folder to be build"
+    },
+    "outDir": {
+      "title": "Out dir path",
+      "type": "string"
+    },
+    "jsp": {
+      "title": "JSP custom code to be injected in the build",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["variable", "body", "header"],
+            "title": "Defines where the code will be injected"
+          },
+          "code": {
+            "type": "string",
+            "title": "The JSP code to be inject. If used with `path`, the `code` will be used as prefered one"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path of the JSP code file. If used with `code`, the `code` will be used as prefered one"
+          }
+        },
+        "required": ["type"],
+        "anyOf": [
+          {
+            "properties": {
+              "type": {
+                "enum": ["variable"]
+              },
+              "varName": {
+                "type": "string",
+                "title": "Variable name to be created"
+              }
+            },
+            "required": ["varName"]
+          },
+          {
+            "properties": {
+              "type": {
+                "enum": ["body"]
+              }
+            }
+          },
+          {
+            "properties": {
+              "type": {
+                "enum": ["header"]
+              }
+            }
+          }
+        ],
+        "oneOf": [
+          {
+            "required": ["code"]
+          },
+          {
+            "required": ["path"]
+          }
+        ]
+      }
+    }
+  },
+  "required": ["src", "outDir", "jsp"],
+  "additionalProperties": false
+}
