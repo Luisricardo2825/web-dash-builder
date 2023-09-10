@@ -11,10 +11,12 @@
   "files": [
     "web-dash-builder.linux-x64-gnu.node"
   ],
+  "description": "CLI for dash building",
   "license": "MIT",
   "engines": {
     "node": ">= 10"
   },
+  "repository": "https://github.com/Luisricardo2825/web-dash-builder",
   "libc": [
     "glibc"
   ]

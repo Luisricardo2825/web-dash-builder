@@ -28,8 +28,11 @@
     "version": "napi version"
   },
   "packageManager": "yarn@3.6.3",
-  "repository": {
-    "url": "https://github.com/Luisricardo2825/web-dash-builder",
-    "type": "git"
-  }
+  "repository": "https://github.com/Luisricardo2825/web-dash-builder",
+  "optionalDependencies": {
+    "web-dash-builder-win32-x64-msvc": "0.0.4",
+    "web-dash-builder-darwin-x64": "0.0.4",
+    "web-dash-builder-linux-x64-gnu": "0.0.4"
+  },
+  "description": "CLI for dash building"
 }
