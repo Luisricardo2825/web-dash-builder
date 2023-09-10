@@ -27,5 +27,6 @@
     "universal": "napi universal",
     "version": "napi version"
   },
-  "packageManager": "yarn@3.6.3"
+  "packageManager": "yarn@3.6.3",
+  "repository": "https://github.com/Luisricardo2825/web-dash-builder"
 }
