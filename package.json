@@ -28,5 +28,8 @@
     "version": "napi version"
   },
   "packageManager": "yarn@3.6.3",
-  "repository": "https://github.com/Luisricardo2825/web-dash-builder"
+  "repository": {
+    "url": "https://github.com/Luisricardo2825/web-dash-builder",
+    "type": "git"
+  }
 }
