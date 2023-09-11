@@ -8,8 +8,8 @@
     "triples": {}
   },
   "bin": {
-    "web-dash-builder": "./index.js",
-    "wdb": "./index.js"
+    "wdb": "./index.js",
+    "web-dash-builder": "./index.js"
   },
   "license": "MIT",
   "devDependencies": {
