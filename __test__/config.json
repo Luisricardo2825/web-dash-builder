@@ -1,6 +1,0 @@
-{
-    "$schema": "https://raw.githubusercontent.com/Luisricardo2825/dash_builder/master/schema.json",
-    "jsp": [],
-    "outDir": "SankhyaBuild",
-    "src": "dev"
-}
