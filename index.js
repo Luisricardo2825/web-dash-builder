@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const { build } = require("./main.js");
 
 function buildCommand() {
