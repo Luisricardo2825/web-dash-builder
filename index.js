@@ -22,4 +22,6 @@ function buildCommand() {
     });
   }
 }
+
+buildCommand();
 module.exports.build = build;
