@@ -1,6 +1,6 @@
 {
   "name": "web-dash-builder",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "main": "index.js",
   "types": "index.d.ts",
   "napi": {
@@ -23,7 +23,7 @@
     "build": "napi build --platform --release --js main.js",
     "build:debug": "napi build --platform",
     "prepublishOnly": "napi prepublish -t npm",
-    "test": "ava",
+    "test": "ava --build",
     "universal": "napi universal",
     "version": "napi version"
   },
