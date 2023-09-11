@@ -7,6 +7,10 @@
     "name": "web-dash-builder",
     "triples": {}
   },
+  "bin": {
+    "web-dash-builder": "./index.js",
+    "wdb": "./index.js"
+  },
   "license": "MIT",
   "devDependencies": {
     "@napi-rs/cli": "^2.16.3",
