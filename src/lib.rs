@@ -19,18 +19,10 @@ use crate::config_schema::{ConfigSchema, Jsp};
 
 #[napi]
 pub fn build(arg: Option<Either<ConfigSchema, String>>) -> bool {
-  let result = build_internal(arg);
-
-  match result {
-    Ok(res) => res,
-    Err(_) => {
-      println!("Build failed");
-      return false;
-    }
-  }
+  return build_internal(arg);
 }
 
-fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> Result<bool, Box<dyn Error>> {
+fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   let ConfigSchema {
     mut src,
     mut out_dir,
@@ -57,7 +49,27 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> Result<bool, Box
   let mut out_path = Path::new(&out_dir.unwrap()).to_path_buf();
   let src_path = Path::new(&src.unwrap()).to_path_buf();
   // Copy the whole build directory to dist
-  copy_dir(&src_path, &out_path).expect("Could not copy build directory");
+  match copy_dir(&src_path, &out_path) {
+    Err(error) => {
+      if !src_path.exists() {
+        eprintln!(
+          "Could not find the build directory: {}",
+          &src_path.display()
+        );
+        return false;
+      }
+      if !out_path.exists() {
+        eprintln!(
+          "Could not find the output directory: {}",
+          &out_path.display()
+        );
+        return false;
+      }
+      eprintln!("Build failed: {}", error);
+      return false;
+    }
+    Ok(_) => {}
+  };
 
   let mut custom_jsp_header: Vec<String> = vec![header::get().to_string()];
   let mut custom_jsp_content: Vec<String> = vec![];
@@ -75,7 +87,13 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> Result<bool, Box
       if path.is_some() {
         let path = ele.path.as_ref().unwrap();
         let jsp_path = Path::new(path).to_path_buf();
-        let content = fs::read_to_string(&jsp_path).unwrap();
+        let content = match fs::read_to_string(&jsp_path) {
+          Ok(res) => res,
+          Err(_) => {
+            eprintln!("Could not find the file: {}", &jsp_path.display());
+            return false;
+          }
+        };
         custom_jsp_content.push(content);
       }
       if code.is_some() {
@@ -87,7 +105,13 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> Result<bool, Box
       if path.is_some() {
         let path = ele.path.as_ref().unwrap();
         let jsp_path = Path::new(path).to_path_buf();
-        let content = fs::read_to_string(&jsp_path).unwrap();
+        let content = match fs::read_to_string(&jsp_path) {
+          Ok(res) => res,
+          Err(_) => {
+            eprintln!("Could not find the file: {}", &jsp_path.display());
+            return false;
+          }
+        };
         custom_jsp_header.push(content);
       }
       if code.is_some() {
@@ -99,7 +123,13 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> Result<bool, Box
       if path.is_some() {
         let path = ele.path.as_ref().unwrap();
         let jsp_path = Path::new(path).to_path_buf();
-        let code = fs::read_to_string(&jsp_path).unwrap();
+        let code = match fs::read_to_string(&jsp_path) {
+          Ok(res) => res,
+          Err(_) => {
+            eprintln!("Could not find the file: {}", &jsp_path.display());
+            return false;
+          }
+        };
         let var_name = ele.var_name.as_ref().unwrap();
         custom_jsp_variables.push(format!("var {}={};", var_name, code));
       }
@@ -117,7 +147,16 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> Result<bool, Box
   let mut path = Path::new(&out_path).to_path_buf();
 
   // Read html file
-  let mut file = fs::read_to_string(&path).unwrap();
+  let mut file = match fs::read_to_string(&path) {
+    Ok(res) => res,
+    Err(_) => {
+      eprintln!(
+        "Could not find index.html in the build directory: {}",
+        &path.display()
+      );
+      return false;
+    }
+  };
   file.insert_str(0, &custom_jsp_header.join("\n"));
 
   // Set a new extension for HTML file to create it as JSP
@@ -125,7 +164,13 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> Result<bool, Box
 
   // Uses regex to get the <head> tag from html file
   let re = Regex::new(r"<head>[.\s\S]*?</head>").unwrap();
-  let caps = re.captures(&file).expect("Tag <head> not found");
+  let caps = match re.captures(&file) {
+    Some(res) => res,
+    None => {
+      eprintln!("Could not find <head> tag in the index.html file");
+      return false;
+    }
+  };
   let header = caps.get(0).unwrap().as_str();
   let header_str = header.to_string();
 
@@ -151,14 +196,34 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> Result<bool, Box
   file = result.to_string();
   // Minify HTML
   let mut html_minifier = HTMLMinifier::new();
-  html_minifier.digest(&file).unwrap();
+  match html_minifier.digest(&file) {
+    Ok(_) => {
+      println!("Minified HTML");
+    }
+    Err(_) => {
+      eprintln!("Could not minify the HTML");
+      return false;
+    }
+  };
 
   // Write minified HTML into the JSP file
-  fs::write(&path, html_minifier.get_html()).unwrap();
-  println!("{}", path.display());
-
+  match fs::write(&path, html_minifier.get_html()) {
+    Ok(_) => {
+      println!("Minified HTML written into the JSP file");
+    }
+    Err(_) => {
+      eprintln!("Could not write minified HTML into JSP file");
+      return false;
+    }
+  }
   // Create zip file
-  let mut zip_file_path = out_path.clone().parent().unwrap().to_path_buf();
+  let mut zip_file_path = match out_path.clone().parent() {
+    Some(res) => res.to_path_buf(),
+    None => {
+      eprintln!("Could not create zip file");
+      return false;
+    }
+  };
   zip_file_path.set_extension("zip");
   let zip_file = File::create(zip_file_path).unwrap();
   let mut zip = ZipWriter::new(zip_file);
@@ -167,13 +232,13 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> Result<bool, Box
 
   // Check if zip was created
   if result.is_err() {
-    println!("Could not create zip file");
-    return Err("Could not create zip file".into());
+    eprintln!("Could not zip the directory:{}", &out_path.display());
+    return false;
   }
 
   println!("Created zip file: dist.zip");
 
-  return Ok(true);
+  return true;
 }
 
 fn copy_dir(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> {

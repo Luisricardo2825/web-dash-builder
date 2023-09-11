@@ -1,8 +1,8 @@
 import test from "ava";
 
-import { build } from "../index.js";
+test("Build in code", async (t) => {
+  const { build } = (await import("../index.js")).default;
 
-test("Build", (t) => {
   t.is(
     build({
       jsp: [],
@@ -11,4 +11,15 @@ test("Build", (t) => {
     }),
     true
   );
+});
+
+test("Build", async (t) => {
+  let ok = true;
+  try {
+    const { build } = await import("../index.js");
+    ok = true;
+  } catch (e) {
+    ok = false;
+  }
+  t.is(ok, true);
 });
