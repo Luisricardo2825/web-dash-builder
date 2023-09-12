@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const { build } = require("./main.js");
 const { networkInterfaces } = require("os");
+const fs = require("fs");
 function getIP() {
   const nets = networkInterfaces();
   const results = Object.create(null); // Or just '{}', an empty object
@@ -122,4 +123,4 @@ function buildCommand() {
 }
 buildCommand();
 module.exports.build = build;
-module.exports.VitePlugin = plugin;
+module.exports.plugin = plugin;

@@ -1,3 +1,7 @@
-import type { ConfigSchema, Jsp, build } from "./main";
-function plugin(devBuildConfig?: ConfigSchema, prodBuildConfig?: ConfigSchema);
-export { ConfigSchema, Jsp, build, plugin };
+import type { ConfigSchema } from "./main";
+export function plugin(
+  devBuildConfig?: ConfigSchema,
+  prodBuildConfig?: ConfigSchema
+);
+
+export * from "./main";
