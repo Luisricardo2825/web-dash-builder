@@ -1963,23 +1963,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"web-dash-builder-darwin-x64@npm:0.0.9":
-  version: 0.0.9
-  resolution: "web-dash-builder-darwin-x64@npm:0.0.9"
+"web-dash-builder-darwin-x64@npm:0.0.10":
+  version: 0.0.10
+  resolution: "web-dash-builder-darwin-x64@npm:0.0.10"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"web-dash-builder-linux-x64-gnu@npm:0.0.9":
-  version: 0.0.9
-  resolution: "web-dash-builder-linux-x64-gnu@npm:0.0.9"
+"web-dash-builder-linux-x64-gnu@npm:0.0.10":
+  version: 0.0.10
+  resolution: "web-dash-builder-linux-x64-gnu@npm:0.0.10"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"web-dash-builder-win32-x64-msvc@npm:0.0.9":
-  version: 0.0.9
-  resolution: "web-dash-builder-win32-x64-msvc@npm:0.0.9"
+"web-dash-builder-win32-x64-msvc@npm:0.0.10":
+  version: 0.0.10
+  resolution: "web-dash-builder-win32-x64-msvc@npm:0.0.10"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -1990,9 +1990,9 @@ __metadata:
   dependencies:
     "@napi-rs/cli": ^2.16.3
     ava: ^5.1.1
-    web-dash-builder-darwin-x64: 0.0.9
-    web-dash-builder-linux-x64-gnu: 0.0.9
-    web-dash-builder-win32-x64-msvc: 0.0.9
+    web-dash-builder-darwin-x64: 0.0.10
+    web-dash-builder-linux-x64-gnu: 0.0.10
+    web-dash-builder-win32-x64-msvc: 0.0.10
   dependenciesMeta:
     web-dash-builder-darwin-x64:
       optional: true
