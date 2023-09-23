@@ -242,6 +242,10 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
 }
 
 fn copy_dir(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> {
+  let dir_exist = dst.as_ref().exists();
+  if dir_exist {
+    fs::remove_dir_all(&dst).unwrap();
+  }
   fs::create_dir_all(&dst)?;
   for entry in fs::read_dir(src)? {
     let entry = entry?;
