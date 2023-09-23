@@ -32,20 +32,20 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
     match config {
       Either::A(config) => config,
       Either::B(file_path) => read_config_from_file(file_path).unwrap_or(ConfigSchema {
-        src: Option::Some("./build".to_owned()),
-        out_dir: Option::Some("./dist".to_owned()),
+        src: Option::Some("./dist".to_owned()),
+        out_dir: Option::Some("./snk".to_owned()),
         jsp: Option::None,
       }),
     }
   } else {
     read_config_from_file("./wdb.json".to_owned()).unwrap_or(ConfigSchema {
-      src: Option::Some("./build".to_owned()),
-      out_dir: Option::Some("./dist".to_owned()),
+      src: Option::Some("./dist".to_owned()),
+      out_dir: Option::Some("./snk".to_owned()),
       jsp: Option::None,
     })
   };
-  src = Option::Some(src.unwrap_or("./build".to_owned()));
-  out_dir = Option::Some(out_dir.unwrap_or("./dist".to_owned()));
+  src = Option::Some(src.unwrap_or("./dist".to_owned()));
+  out_dir = Option::Some(out_dir.unwrap_or("./snk".to_owned()));
   let mut out_path = Path::new(&out_dir.unwrap()).to_path_buf();
   let src_path = Path::new(&src.unwrap()).to_path_buf();
   // Copy the whole build directory to dist

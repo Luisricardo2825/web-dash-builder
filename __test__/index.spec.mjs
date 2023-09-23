@@ -17,7 +17,7 @@ test("Build", async (t) => {
   let ok = true;
   try {
     const { build } = await import("../index.js");
-    ok = true;
+    ok = build();
   } catch (e) {
     ok = false;
   }
