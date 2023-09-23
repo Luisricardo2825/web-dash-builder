@@ -58,16 +58,20 @@ const plugin = (
     prodBuildConfig: {
       jsp: [],
       outDir: "SankhyaBuild",
-      src: "build",
+      src: "dist",
     },
   }
 ) => {
   const { devBuildConfig, prodBuildConfig } = options;
+  let userConfig = {};
   return [
     {
       name: "build-sankhya", // the name of your custom plugin. Could be anything.
       writeBundle: () => {
         console.log("Iniciando build para o sankhya...");
+        if (userConfig?.build?.outDir) {
+          prodBuildConfig.src = userConfig.build.outDir;
+        }
         build(prodBuildConfig);
         console.log("\nBuild finalizada");
       },
@@ -77,8 +81,13 @@ const plugin = (
           console.log("Iniciando build para o sankhya...");
           fs.mkdir("./dev", { recursive: true }, (err) => {
             if (err) throw err;
+            let devFolderPath = "dev";
+            if (userConfig?.build?.outDir) {
+              devBuildConfig.src = userConfig.build.outDir;
+              devFolderPath = userConfig.build.outDir;
+            }
             fs.writeFile(
-              "./dev/index.html",
+              devFolderPath + "/index.html",
               BuildDevHtml(DevHtml(), `http://${getIP()}:${port}`),
               (err) => {
                 if (err) throw err;
@@ -89,6 +98,7 @@ const plugin = (
         });
       },
       config(config) {
+        userConfig = config;
         if (config.define)
           config.define.__IP_SERVER__ = JSON.stringify(getIP());
         else
