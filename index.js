@@ -50,19 +50,19 @@ const DevHtml = () =>
 
 const plugin = (
   options = {
-    devBuildConfig: {
+    devConfig: {
       jsp: [],
       outDir: "SankhyaDevBuild",
       src: "dev",
     },
-    prodBuildConfig: {
+    prodConfig: {
       jsp: [],
       outDir: "SankhyaBuild",
       src: "dist",
     },
   }
 ) => {
-  const { devBuildConfig, prodBuildConfig } = options;
+  const { devConfig, prodConfig } = options;
   let userConfig = {};
   return [
     {
@@ -70,9 +70,9 @@ const plugin = (
       writeBundle: () => {
         console.log("Iniciando build para o sankhya...");
         if (userConfig?.build?.outDir) {
-          prodBuildConfig.src = userConfig.build.outDir;
+          prodConfig.src = userConfig.build.outDir;
         }
-        build(prodBuildConfig);
+        build(prodConfig);
         console.log("\nBuild finalizada");
       },
       configureServer(server) {
@@ -83,7 +83,7 @@ const plugin = (
             if (err) throw err;
             let devFolderPath = "dev";
             if (userConfig?.build?.outDir) {
-              devBuildConfig.src = userConfig.build.outDir;
+              devConfig.src = userConfig.build.outDir;
               devFolderPath = userConfig.build.outDir;
             }
             fs.writeFile(
@@ -91,7 +91,7 @@ const plugin = (
               BuildDevHtml(DevHtml(), `http://${getIP()}:${port}`),
               (err) => {
                 if (err) throw err;
-                build(devBuildConfig);
+                build(devConfig);
               }
             );
           });
