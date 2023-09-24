@@ -1,25 +1,10 @@
 import test from "ava";
 
-test("Build in code", async (t) => {
+test("Build", async (t) => {
   const { build } = (await import("../index.js")).default;
 
   t.is(
-    build({
-      jsp: [],
-      outDir: "dist",
-      src: "./build",
-    }),
+    build(),
     true
   );
-});
-
-test("Build", async (t) => {
-  let ok = true;
-  try {
-    const { build } = await import("../index.js");
-    ok = build();
-  } catch (e) {
-    ok = false;
-  }
-  t.is(ok, true);
 });
