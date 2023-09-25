@@ -1,0 +1,1 @@
+import{o as e,U as t,M as o,_ as r}from"./index-546ac442.js";const i=o(()=>r(()=>import("./Teste1-7384400d.js"),["assets/Teste1-7384400d.js","assets/index-546ac442.js","assets/index-d217e6bb.css"]));function a(){return e(t,{fallback:e("div",{children:"loading..."}),children:e(i,{})})}export{a as default};
