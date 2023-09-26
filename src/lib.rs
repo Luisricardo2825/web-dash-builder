@@ -75,9 +75,12 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   let files = recurse(&out_path);
 
   for file in files {
-    treat_asset_path(&file);
-    // treat_import_path(&file);
-    treat_dyn_assets_path(&file);
+    // File extension
+    let extension = file.extension().unwrap_or_default().to_str().unwrap();
+    if ["js", "JS", "html", "HTML", "CSS", "css", "json", "JSON"].contains(&extension) {
+      treat_asset_path(&file);
+      treat_dyn_assets_path(&file);
+    }
   }
 
   let mut custom_jsp_header: Vec<String> = vec![header::get().to_string()];
@@ -160,7 +163,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
     Ok(res) => res,
     Err(_) => {
       eprintln!(
-        "Could not find index.html in the build directory: {}",
+        "Could not find index.html in the directory: {}",
         &path.display()
       );
       return false;
@@ -172,11 +175,11 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   path.set_extension("jsp");
 
   // Uses regex to get the <head> tag from html file
-  let re = Regex::new(r"<head>[.\s\S]*?</head>").unwrap();
+  let re = Regex::new(r"<head>[.\s\S]*?<\/head>").unwrap();
   let caps = match re.captures(&file) {
     Some(res) => res,
     None => {
-      eprintln!("Could not find <head> tag in the index.html file");
+      eprintln!("Could not find <head> tag in the file: {}", &path.display());
       return false;
     }
   };
@@ -234,7 +237,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
     }
   };
   zip_file_path.set_extension("zip");
-  let zip_file = File::create(zip_file_path).unwrap();
+  let zip_file = File::create(&zip_file_path).unwrap();
   let mut zip = ZipWriter::new(zip_file);
   out_path = out_path.parent().unwrap().to_path_buf();
   let result = zip.create_from_directory(&out_path);
@@ -245,7 +248,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
     return false;
   }
 
-  println!("Created zip file: dist.zip");
+  println!("Created zip file: {:?}", &zip_file_path);
 
   return true;
 }
@@ -328,34 +331,6 @@ fn treat_asset_path<P: AsRef<Path>>(path: P) -> bool {
         content = content.replace(value, &new_value);
         file.write_all(content.as_bytes()).unwrap();
       }
-    } else {
-      file.write_all(content.as_bytes()).unwrap();
-    }
-  }
-  return true;
-}
-
-fn treat_import_path<P: AsRef<Path>>(path: P) -> bool {
-  let regex =
-    Regex::new(r#"(?i)import\(\s*('\.?\/[^']+\.(js)'|"\.?\/[^"]+\.(js)"|`\.?\/[^`]+\.(js)`)\s*\)"#)
-      .unwrap();
-  let path_ = path.as_ref();
-  let extension = path_.extension();
-  let content = match fs::read_to_string(&path_) {
-    Ok(res) => res,
-    Err(_) => {
-      eprintln!("Could not find the file: {:?}", &path_);
-      return false;
-    }
-  };
-
-  if extension.is_some() {
-    let extension = extension.unwrap().to_str().unwrap();
-    let mut file = File::create(&path_).unwrap();
-    if extension == "js" {
-      let substitution = "import(window.resolveAsset($1))";
-      let result = regex.replace_all(&content, substitution);
-      file.write_all(result.as_bytes()).unwrap();
     } else {
       file.write_all(content.as_bytes()).unwrap();
     }
