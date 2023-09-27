@@ -1,12 +1,14 @@
 # Web dash builder(wdb)
 
 > Ferramenta para tornar websites compatíveis com o Sankhya.
+# Como funciona?
 
+ O pacote recebe a paste, converte e gera uma nova pasta com os arquivos já convertidos, assim como também gera um arquivo ZIP pronto para ser enviado ao construtor de componentes
+ 
 ## Instalação
 ```sh
 $ npm i web-dash-builder
 ```
-
 ou se preferir Yarn:
 
 ```sh
