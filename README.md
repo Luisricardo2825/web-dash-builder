@@ -30,7 +30,7 @@ export default defineConfig({
 ### Executando script
 
 ```js
- const { build } = (await import("../index.js")).default;
+import {build} from "web-dash-builder";
 
  build({
       jsp: [],
