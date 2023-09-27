@@ -20,7 +20,7 @@ $ yarn add --dev web-dash-builder
 ### Vite
 
 ```js
-$ import { defineConfig } from "vite";
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import { plugin } from "web-dash-builder";
 
