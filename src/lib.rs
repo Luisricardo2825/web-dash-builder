@@ -346,45 +346,46 @@ fn treat_asset_path<P: AsRef<Path>>(path: P) -> bool {
 }
 
 fn treat_dyn_assets_path<P: AsRef<Path>>(path: P) -> bool {
-  let regex = Regex::new(
-    r#"(?mi)\s*('[^\.\/][^']+\.(js|css)'|"[^\.\/][^"]+\.(js|css)"|`[^\.\/][^`]+\.(js|css)`)\s*"#,
-  )
-  .unwrap();
+  let regex =
+    Regex::new(r#"(?mi)\s*('[^']+\.(js|css)'|"[^"]+\.(js|css)"|`[^`]+\.(js|css)`)\s*"#).unwrap();
 
   let path_ = path.as_ref();
   let extension = path_.extension();
-  let content = match fs::read_to_string(&path_) {
+  let mut content = match fs::read_to_string(&path_) {
     Ok(res) => res,
     Err(_) => {
       eprintln!("Could not find the file: {:?}", &path_);
       return false;
     }
   };
-
   if extension.is_some() {
-    let mut matchs = regex.captures_iter(&content);
     let extension = extension.unwrap().to_str().unwrap();
     let mut file = File::create(&path_).unwrap();
     if extension == "js" {
-      let mut result = content.to_owned();
+      let cont = content.clone();
+      let mut matchs = regex.captures_iter(&cont);
+
       loop {
         let mat = &mut matchs.next();
         if mat.is_none() {
           file.write_all(content.as_bytes()).unwrap();
           break;
         }
+
         let mat_some = mat.as_ref().unwrap();
         let value = mat_some.get(1).unwrap().as_str();
 
-        // Ignore if it is a link
-        if !value.starts_with("\"https") || !value.starts_with("\"http") {
-          let new_value = format!(
-            "(window.resolveAsset({}))",
-            mat_some.get(1).unwrap().as_str()
-          );
-          result = result.replace(value, &new_value);
+        if value.starts_with("\"https") || value.starts_with("\"http") {
+          continue;
         }
-        file.write_all(result.as_bytes()).unwrap();
+
+        let new_value = format!(
+          "(window.resolveAsset({}))",
+          mat_some.get(1).unwrap().as_str()
+        );
+        content = content.replace(value, &new_value);
+        file.write_all(content.as_bytes()).unwrap();
+        content = "".to_owned(); // Esvazia para a proxima interação
       }
     } else {
       file.write_all(content.as_bytes()).unwrap();
