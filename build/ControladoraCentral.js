@@ -1,9 +1,3 @@
-/**
- * Construtor da controladora da pagina inicial
- *
- * Aqui, foi definido como uma classe, mas pode ser instanciada como uma funcao.
- * Nesse caso da classe, necessario ser usado os elementos inerentes a instancia atual (this)
- */
 class ControladoraCentral {
   /**
    * Importacao dos elementos nativos injetados pelo SNK.JS ou por modulos devidamente definidos
@@ -27,8 +21,7 @@ class ControladoraCentral {
     JX.removerFrame({
       paginaInicial:
         "index.jsp" /** Local da pagina inicial(nao use BASE_FOLDER) **/,
-      instancia:
-        "ASTRO" /** Nome EXATO (case sensitive) do Componente BI **/,
+      instancia: "ASTRO" /** Nome EXATO (case sensitive) do Componente BI **/,
     });
     /** **/
 

@@ -169,11 +169,9 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
       return false;
     }
   };
-  file.insert_str(0, &custom_jsp_header.join("\n"));
 
   // Set a new extension for HTML file to create it as JSP
   path.set_extension("jsp");
-
   // Uses regex to get the <head> tag from html file
   let re = Regex::new(r"<head>[.\s\S]*?<\/head>").unwrap();
   let caps = match re.captures(&file) {
@@ -200,12 +198,14 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
     ("<head>\n".to_owned() + &new_header).as_str(),
   );
   //Replace href attr of link tag
-  let regex = Regex::new(r#"(src|href)\=(\"|')(\.?\/+[\w\s\#\/\-\.]+)?(\"|')"#).unwrap();
+  let regex = Regex::new(r#"([\w\S]*)\=(\"|')(\.?\/+[\w\s\#\/\-\.]+)(\"|')"#).unwrap();
   let substitution = "$1=\"$${BASE_FOLDER}$3\"";
 
   // result will be a String with the substituted value
   let result = regex.replace_all(&file, substitution);
   file = result.to_string();
+  file.insert_str(0, &custom_jsp_header.join("\n"));
+
   // Minify HTML
   let mut html_minifier = HTMLMinifier::new();
   match html_minifier.digest(&file) {

@@ -1,24 +1,4 @@
-<!DOCTYPE html>
-
-<head>
-  <title></title>
-  <meta charset="UTF-8"><!-- ESTILOS --><!-- Estilos Externos -->
-  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.2.1/angular-material.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-  <!-- --><!-- Estilos Internos -->
-  <link rel="stylesheet" href="/mge/assets/vendors/ui-grid/ui-grid.min.css?v=">
-  <link rel="stylesheet" href="/mge/assets/vendors/bootstrap.min.css?v=">
-  <link rel="stylesheet" href="/mge/assets/vendors/loading-bar.min.css?v=">
-  <link rel="stylesheet" href="/mge/js/jqwidgets/styles/jqx.base.css?v=">
-  <link rel="stylesheet" href="/mge/js/jqwidgets/styles/jqx.metro.css?v=">
-  <link rel="stylesheet" href="/mge/assets/css/snk.min.css?v=">
-  <link rel="stylesheet" href="/mge/assets/vendors/bpmn/css/diagram-js.css?v=">
-  <link rel="stylesheet" href="/mge/assets/vendors/bpmn/css/bpmn.css?v=">
-  <link rel="stylesheet" href="/mge/assets/vendors/bpmn/css/bpmnsnk.css?v=">
-  <link rel="stylesheet" href="/mge/scripts/vendors/fullcalendar/main.min.css?v=">
-  <link rel="stylesheet" href="/mge/html5/DynaformLauncher/DynaformLauncher.css?v=">
-  <!-- --><!-- Estilos Customizados --><!-- IMPORTE AQUI SEUS ARQUIVOS CSS --><!--  --><!-- Estilização para remoção forcada da div de componente customizaddo --><!-- --><!-- --><!-- SCRIPTS GENERICOS (_NAO MODIFICAR_) --><!-- Configuracao de parametros em tela do Sankhya -->
-  <script type="text/javascript">
+<!DOCTYPE html><html lang="en"><head><title>Pagina</title><meta charset="UTF-8"><!-- ESTILOS --><!-- Estilos Externos --><link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.2.1/angular-material.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"><script src="https://cdn.jsdelivr.net/gh/wansleynery/SankhyaJX/jx.min.js"></script><!-- --><!-- Estilos Internos --><link rel="stylesheet" href="/mge/assets/vendors/ui-grid/ui-grid.min.css?v="><link rel="stylesheet" href="/mge/assets/vendors/bootstrap.min.css?v="><link rel="stylesheet" href="/mge/assets/vendors/loading-bar.min.css?v="><link rel="stylesheet" href="/mge/js/jqwidgets/styles/jqx.base.css?v="><link rel="stylesheet" href="/mge/js/jqwidgets/styles/jqx.metro.css?v="><link rel="stylesheet" href="/mge/assets/css/snk.min.css?v="><link rel="stylesheet" href="/mge/assets/vendors/bpmn/css/diagram-js.css?v="><link rel="stylesheet" href="/mge/assets/vendors/bpmn/css/bpmn.css?v="><link rel="stylesheet" href="/mge/assets/vendors/bpmn/css/bpmnsnk.css?v="><link rel="stylesheet" href="/mge/scripts/vendors/fullcalendar/main.min.css?v="><link rel="stylesheet" href="/mge/html5/DynaformLauncher/DynaformLauncher.css?v="><!-- --><!-- Estilos Customizados --><!-- IMPORTE AQUI SEUS ARQUIVOS CSS --><!--  --><!-- Estilização para remoção forcada da div de componente customizaddo --><!-- --><!-- --><!-- SCRIPTS GENERICOS (_NAO MODIFICAR_) --><!-- Configuracao de parametros em tela do Sankhya --><script type="text/javascript">
     /* Variaveis da internacionalizacao das strings */
     var locale = "pt_BR";
     var i18nlocal = null; // .i18n        : buildLocalI18nVar-method : bundle do dic. de dados
@@ -92,146 +72,16 @@
       "X21nZS5xdGQucmVnaXN0cm9zLm1haXMudXRpbGl6YWRvcy5wZXNxdWlzYV9fPV9fMTBfXztfX21nZS5xdGQucmVnaXN0cm9z" +
       "Lm1haXMudXRpbGl6YWRvcy5yZXNldF9fPV9fMzA=";
     /* */
-  </script><!-- --><!-- Modulo de importacao do JQuery -->
-  <script src="/mge/js/util/jquery-1.9.1.min.js?v="></script><!-- Gerenciador do token de autenticacao -->
-  <script src="/mge/js/sf/sf.js?v="></script><!-- Modulo responsavel pelo processamento do Base64 -->
-  <script src="/mge/js/util/Base64.js?v="></script><!-- Modulo responsavel pela chamada de outros apps do sistema -->
-  <script src="/mge/js/AppletCaller.js?v="></script><!-- Modulo responsavel pela impressao -->
-  <script src="/mge/js/impressao.js?v="></script><!-- Modulo para correcao de layout para dispositivos IOS -->
-  <script src="/mge/scripts/custom-native-functions.js?v="></script><!-- Dependencias e modulos do Angular -->
-  <script src="/mge/scripts/vendors/angular/angular.js?v="></script>
-  <script src="/mge/scripts/vendors/angular/angular-touch.js?v="></script>
-  <script src="/mge/scripts/vendors/angular/angular-animate.min.js?v="></script>
-  <script src="/mge/scripts/vendors/angular/angular-aria.min.js?v="></script>
-  <script src="/mge/scripts/vendors/angular/angular-sanitize.min.js?v="></script>
-  <script src="/mge/scripts/vendors/translate/angular-translate.js?v="></script>
-  <!-- --><!-- Modulo da biblioteca de componentes do Angular Material --><!-- Modulo de importacao para transacoes avancadas com o Sankhya --><!-- Modulo responsavel pelo processamento da tela de carregamento --><!-- Modulo que controla os avisos em tela --><!-- IMPORTE AQUI SUAS BIBLIOTECAS JS ADICIONAIS --><!-- Dependencias padroes das telas do Sankhya -->
-  <script src="/mge/scripts/vendors/ui-bootstrap/ui-bootstrap-tpls.min.js?v="></script>
-  <script src="/mge/scripts/vendors/ui-grid/ui-grid.modified.js?v="></script>
-  <script src="/mge/scripts/vendors/numeral/numeral.min.js?v="></script>
-  <script src="/mge/scripts/vendors/moment/moment.min.js?v="></script>
-  <script src="/mge/scripts/vendors/loading-bar/loading-bar.min.js?v="></script>
-  <script src="/mge/scripts/vendors/sortable/sortable.min.js?v="></script>
-  <script src="/mge/scripts/vendors/ui-mask/mask.min.js?v="></script>
-  <script src="/mge/scripts/vendors/tinymce/tinymce.min.js?v="></script>
-  <script src="/mge/scripts/vendors/tinymce/uitinymce.js?v="></script>
-  <script src="/mge/scripts/vendors/tinymce/langs/pt_BR.js?v="></script>
-  <script src="/mge/scripts/vendors/tinymce/langs/en_CA.js?v="></script>
-  <script src="/mge/scripts/vendors/ace/ace.min.js?v="></script>
-  <script src="/mge/scripts/vendors/clipboard/clipboard.min.js?v="></script>
-  <script src="/mge/scripts/vendors/ag-grid/ag-grid-enterprise.js?v="></script>
-  <script src="/mge/scripts/vendors/bpmn/bpmn-custom-modeler.development.js?v="></script>
-  <script src="/mge/scripts/vendors/snapsvg/snap.svg-min.js?v="></script>
-  <script src="/mge/scripts/vendors/crypto-js/crypto-js.js?v="></script>
-  <script src="/mge/scripts/vendors/fullcalendar/main.min.js?v="></script>
-  <script src="/mge/scripts/vendors/fullcalendar/locales/es.js?v="></script>
-  <script src="/mge/scripts/vendors/fullcalendar/locales/pt-br.js?v="></script>
-  <!-- --><!-- Dependencias e modulos customizados do Sankhya -->
-  <script src="/mge/js/jqwidgets/jqxcore.js?v="></script>
-  <script src="/mge/js/jqwidgets/jqxdata.js?v="></script>
-  <script src="/mge/js/jqwidgets/jqxlistbox.js?v="></script>
-  <script src="/mge/js/jqwidgets/jqxbuttons.js?v="></script>
-  <script src="/mge/js/jqwidgets/jqxscrollbar.js?v="></script>
-  <script src="/mge/js/jqwidgets/jqxmenu.js?v="></script>
-  <script src="/mge/js/jqwidgets/jqxgrid.js?v="></script>
-  <script src="/mge/js/jqwidgets/jqxgrid.selection.js?v="></script>
-  <script src="/mge/js/jqwidgets/jqxgrid.columnsresize.js?v="></script>
-  <script src="/mge/js/jqwidgets/jqxgrid.columnsreorder.js?v="></script>
-  <script src="/mge/js/jqwidgets/jqxgrid.sort.js?v="></script>
-  <script src="/mge/js/jqwidgets/jqxgrid.filter.js?v="></script>
-  <script src="/mge/js/jqwidgets/jqxgrid.aggregates.js?v="></script>
-  <script src="/mge/js/jqwidgets/jqxdropdownlist.js?v="></script>
-  <script src="/mge/scripts/snk.js?v="></script>
-  <script src="/mge/scripts/launcher.js?v="></script>
-  <!-- --><!-- --><!-- CONFIGURACOES --><!-- Importacao das Controladoras -->
-  <script >
-    /**
- * Construtor da controladora da pagina inicial
- *
- * Aqui, foi definido como uma classe, mas pode ser instanciada como uma funcao.
- * Nesse caso da classe, necessario ser usado os elementos inerentes a instancia atual (this)
- */
-    class ControladoraCentral {
-      /**
-       * Importacao dos elementos nativos injetados pelo SNK.JS ou por modulos devidamente definidos
-       */
-      constructor(
-        ObjectUtils,
-        Criteria,
-        DateUtils,
-        SanPopup,
-        MessageUtils,
-        $scope
-      ) {
-        /** **/
-        /** REMOCAO DO FRAME (frame de entorno padrao dos componentes de BI)                             **/
-        /** **/
-        /** Ele recarregara o _iframe_ do componente de BI, por isso, informe o                          **/
-        /** local onde ele encontrara novamente a pagina inicial JSP na propriedade                      **/
-        /** `paginaInicial`. E faremos a busca do componente a ser recarregado baseado                   **/
-        /** no nome exato do componente que devemos informar a propriedade `instancia`                   **/
-        /** **/
-        JX.removerFrame({
-          paginaInicial:
-            "index.jsp" /** Local da pagina inicial(nao use BASE_FOLDER) **/,
-          instancia:
-            "ASTRO" /** Nome EXATO (case sensitive) do Componente BI **/,
-        });
-        /** **/
-
-        /* Interceptadores da entidade de tela */
-        ObjectUtils.implements(this, IDynaformInterceptor);
-        ObjectUtils.implements(this, IDatagridInterceptor);
-        /* */
-
-        /* Modulos de componentes necessarios ao sistema */
-        this.Criteria = Criteria;
-        this.DateUtils = DateUtils;
-        this.SanPopup = SanPopup;
-        this.MessageUtils = MessageUtils;
-        /* */
-
-        /* Variaveis com os dados da entidade principal da tela */
-        this.dataset = undefined;
-        this.formulario = undefined;
-        this.nomeEntidade = `MarcaProduto`;
-        /* */
-      }
-
-      /**
-       * Evento disparado ao se finalizar a criacao e montagem do componente de formulario dinamico
-       *
-       * @param { any } dynaform Instancia e informacoes sobre o formulario dinamico
-       * @param  { any } dataset Instancia do conjunto de informacoes dos registros para preencher a grade de registros
-       */
-      aoCarregarDynaform(dynaform, dataset) {
-        /* Checa se a tabela carregada eh a entidade */
-        if (dataset.getEntityName() === this.nomeEntidade) {
-          /* Salva as informacoes da tabela */
-          this.dataset = dataset;
-          this.formulario = dynaform;
-
-          /* Inicializa o dataset com os valores iniciais */
-          this.dataset.initAndRefresh();
-
-          /* Alterna o modo de visualizacao do formulario para o modo grade */
-          this.formulario.goToGridView();
-        }
-      }
-    }
-
-  </script>
-  <!-- IMPORTE AQUI SUAS SERVICES --><!-- --><!-- Configuracoes editaveis customizadas -->
-  <script>
+  </script><!-- --><!-- Modulo de importacao do JQuery --><script src="/mge/js/util/jquery-1.9.1.min.js?v="></script><!-- Gerenciador do token de autenticacao --><script src="/mge/js/sf/sf.js?v="></script><!-- Modulo responsavel pelo processamento do Base64 --><script src="/mge/js/util/Base64.js?v="></script><!-- Modulo responsavel pela chamada de outros apps do sistema --><script src="/mge/js/AppletCaller.js?v="></script><!-- Modulo responsavel pela impressao --><script src="/mge/js/impressao.js?v="></script><!-- Modulo para correcao de layout para dispositivos IOS --><script src="/mge/scripts/custom-native-functions.js?v="></script><!-- Dependencias e modulos do Angular --><script src="/mge/scripts/vendors/angular/angular.js?v="></script><script src="/mge/scripts/vendors/angular/angular-touch.js?v="></script><script src="/mge/scripts/vendors/angular/angular-animate.min.js?v="></script><script src="/mge/scripts/vendors/angular/angular-aria.min.js?v="></script><script src="/mge/scripts/vendors/angular/angular-sanitize.min.js?v="></script><script src="/mge/scripts/vendors/translate/angular-translate.js?v="></script><!-- --><!-- Modulo da biblioteca de componentes do Angular Material --><!-- Modulo de importacao para transacoes avancadas com o Sankhya --><!-- Modulo responsavel pelo processamento da tela de carregamento --><!-- Modulo que controla os avisos em tela --><!-- IMPORTE AQUI SUAS BIBLIOTECAS JS ADICIONAIS --><!-- Dependencias padroes das telas do Sankhya --><script src="/mge/scripts/vendors/ui-bootstrap/ui-bootstrap-tpls.min.js?v="></script><script src="/mge/scripts/vendors/ui-grid/ui-grid.modified.js?v="></script><script src="/mge/scripts/vendors/numeral/numeral.min.js?v="></script><script src="/mge/scripts/vendors/moment/moment.min.js?v="></script><script src="/mge/scripts/vendors/loading-bar/loading-bar.min.js?v="></script><script src="/mge/scripts/vendors/sortable/sortable.min.js?v="></script><script src="/mge/scripts/vendors/ui-mask/mask.min.js?v="></script><script src="/mge/scripts/vendors/tinymce/tinymce.min.js?v="></script><script src="/mge/scripts/vendors/tinymce/uitinymce.js?v="></script><script src="/mge/scripts/vendors/tinymce/langs/pt_BR.js?v="></script><script src="/mge/scripts/vendors/tinymce/langs/en_CA.js?v="></script><script src="/mge/scripts/vendors/ace/ace.min.js?v="></script><script src="/mge/scripts/vendors/clipboard/clipboard.min.js?v="></script><script src="/mge/scripts/vendors/ag-grid/ag-grid-enterprise.js?v="></script><script src="/mge/scripts/vendors/bpmn/bpmn-custom-modeler.development.js?v="></script><script src="/mge/scripts/vendors/snapsvg/snap.svg-min.js?v="></script><script src="/mge/scripts/vendors/crypto-js/crypto-js.js?v="></script><script src="/mge/scripts/vendors/fullcalendar/main.min.js?v="></script><script src="/mge/scripts/vendors/fullcalendar/locales/es.js?v="></script><script src="/mge/scripts/vendors/fullcalendar/locales/pt-br.js?v="></script><!-- --><!-- Dependencias e modulos customizados do Sankhya --><script src="/mge/js/jqwidgets/jqxcore.js?v="></script><script src="/mge/js/jqwidgets/jqxdata.js?v="></script><script src="/mge/js/jqwidgets/jqxlistbox.js?v="></script><script src="/mge/js/jqwidgets/jqxbuttons.js?v="></script><script src="/mge/js/jqwidgets/jqxscrollbar.js?v="></script><script src="/mge/js/jqwidgets/jqxmenu.js?v="></script><script src="/mge/js/jqwidgets/jqxgrid.js?v="></script><script src="/mge/js/jqwidgets/jqxgrid.selection.js?v="></script><script src="/mge/js/jqwidgets/jqxgrid.columnsresize.js?v="></script><script src="/mge/js/jqwidgets/jqxgrid.columnsreorder.js?v="></script><script src="/mge/js/jqwidgets/jqxgrid.sort.js?v="></script><script src="/mge/js/jqwidgets/jqxgrid.filter.js?v="></script><script src="/mge/js/jqwidgets/jqxgrid.aggregates.js?v="></script><script src="/mge/js/jqwidgets/jqxdropdownlist.js?v="></script><script src="/mge/scripts/snk.js?v="></script><script src="/mge/scripts/launcher.js?v="></script><style>body>div[data-astro-cid-axmzbclq]:nth-child(16)>div[data-astro-cid-axmzbclq]:nth-child(3){height:0!important}body>div[data-astro-cid-axmzbclq].modal-type-default.modal.gray-background.no-padding-modal-body.sk-popup.fade.ng-isolate-scope.in>div[data-astro-cid-axmzbclq],body>div[data-astro-cid-axmzbclq].modal-type-default.modal.no-padding-modal-body.sk-popup.ng-isolate-scope.in>div[data-astro-cid-axmzbclq]{top:5px!important;left:5px!important;width:calc(100% - 10px)!important;height:calc(100% - 10px)!important}body>div[data-astro-cid-axmzbclq].modal-type-default.modal.gray-background.no-padding-modal-body.sk-popup.fade.ng-isolate-scope.in>div[data-astro-cid-axmzbclq]>div[data-astro-cid-axmzbclq],body>div[data-astro-cid-axmzbclq].modal-type-default.modal.no-padding-modal-body.sk-popup.ng-isolate-scope.in>div[data-astro-cid-axmzbclq]>div[data-astro-cid-axmzbclq]{height:100%!important}body>div[data-astro-cid-axmzbclq].modal-type-default.modal.gray-background.no-padding-modal-body.sk-popup.fade.ng-isolate-scope.in>div[data-astro-cid-axmzbclq]>div[data-astro-cid-axmzbclq]>div[data-astro-cid-axmzbclq].modal-body,body>div[data-astro-cid-axmzbclq].modal-type-default.modal.no-padding-modal-body.sk-popup.ng-isolate-scope.in>div[data-astro-cid-axmzbclq]>div[data-astro-cid-axmzbclq]>div[data-astro-cid-axmzbclq].modal-body{height:calc(100% - 32px)!important}
+</style><script type="module" src="/_astro/hoisted.8d38a110.js"></script></head><body><body><script src="/ControladoraCentral.js"></script><script>
     /* Inicializacao do modulo de tabela do Sankhya */
     agGrid.LicenseManager.setLicenseKey(
       "" +
-      "Sankhya_Gestao_de_Negocios_Sankhya-W_2Devs6_November_2020__" +
-      "MTYwNDYyMDgwMDAwMA==1f914bb75813904547879033c6de21d2"
+        "Sankhya_Gestao_de_Negocios_Sankhya-W_2Devs6_November_2020__" +
+        "MTYwNDYyMDgwMDAwMA==1f914bb75813904547879033c6de21d2"
     );
     agGrid.initialiseAgGridWithAngular1(angular);
     /* */
-
     /* Defina aqui o valor que as telas originais setam para essas variaveis */
     globalThis.APPLICATION_NAME = "DynaformLauncher";
     globalThis.MODULE_ID = "DynaformLauncher";
@@ -239,7 +89,6 @@
     globalThis.url = "${BASE_FOLDER}";
     /* */
 
-    /* Classe com as configuracoes de processamento de strings de internacionalizacao */
     class Runner {
       constructor(SkI18nService, SkWorkspace) {
         SkWorkspace.unlockSwitchApp();
@@ -295,8 +144,8 @@
         ];
       }
     );
+    /* */
 
-    /* Função inicializada pelo Launcher nativo das telas Sankhya que cuida das internacionalizacoes */
     function startApplication() {
       /* Instancia o modulo global do AngularJS, bem como todas as suas dependencias e controladoras */
       angular
@@ -310,43 +159,4 @@
       angular.bootstrap(document, [globalThis.app]);
       /* */
     }
-    /* */
-  </script><!-- --><!-- -->
-  <style>
-    body>div[data-astro-cid-j7pv25f6]:nth-child(16)>div[data-astro-cid-j7pv25f6]:nth-child(3) {
-      height: 0 !important
-    }
-
-    body>div[data-astro-cid-j7pv25f6].modal-type-default.modal.gray-background.no-padding-modal-body.sk-popup.fade.ng-isolate-scope.in>div[data-astro-cid-j7pv25f6],
-    body>div[data-astro-cid-j7pv25f6].modal-type-default.modal.no-padding-modal-body.sk-popup.ng-isolate-scope.in>div[data-astro-cid-j7pv25f6] {
-      top: 5px !important;
-      left: 5px !important;
-      width: calc(100% - 10px) !important;
-      height: calc(100% - 10px) !important
-    }
-
-    body>div[data-astro-cid-j7pv25f6].modal-type-default.modal.gray-background.no-padding-modal-body.sk-popup.fade.ng-isolate-scope.in>div[data-astro-cid-j7pv25f6]>div[data-astro-cid-j7pv25f6],
-    body>div[data-astro-cid-j7pv25f6].modal-type-default.modal.no-padding-modal-body.sk-popup.ng-isolate-scope.in>div[data-astro-cid-j7pv25f6]>div[data-astro-cid-j7pv25f6] {
-      height: 100% !important
-    }
-
-    body>div[data-astro-cid-j7pv25f6].modal-type-default.modal.gray-background.no-padding-modal-body.sk-popup.fade.ng-isolate-scope.in>div[data-astro-cid-j7pv25f6]>div[data-astro-cid-j7pv25f6]>div[data-astro-cid-j7pv25f6].modal-body,
-    body>div[data-astro-cid-j7pv25f6].modal-type-default.modal.no-padding-modal-body.sk-popup.ng-isolate-scope.in>div[data-astro-cid-j7pv25f6]>div[data-astro-cid-j7pv25f6]>div[data-astro-cid-j7pv25f6].modal-body {
-      height: calc(100% - 32px) !important
-    }
-  </style>
-  <script type="module" src="/_astro/hoisted.8d38a110.js"></script>
-</head>
-
-<body data-astro-cid-j7pv25f6>
-  <!-- Componente necessario para a preparacao fundamental inicial das telas em AngularJS --><sk-application
-    layout="column" class="dynaform-launcher" ng-controller="ControladoraCentral as central"
-    data-astro-cid-j7pv25f6><!-- Componente responsavel pela montagem automatica da grade e formulario vinculado a entidade --><sk-dynaform
-      flex="true" layout="column" sk-entity-name="{{ central.nomeEntidade }}"
-      sk-on-dynaform-loaded="central.aoCarregarDynaform (dynaform, dataset)" sk-skip-start-page="true"
-      sk-disable-tour="true" sk-enable-toolpanel="true" sk-show-edit-button="true" sk-hide-buttons-config="false"
-      sk-hide-button-favorite="false" sk-hide-button-recents="false" sk-hide-entity-card="false"
-      sk-hide-button-entity-attach="false" sk-hide-entity-search-field="false"
-      data-astro-cid-j7pv25f6></sk-dynaform></sk-application><!-- -->
-  ../../public/Impressao
-</body>
+  </script><!-- Componente necessario para a preparacao fundamental inicial das telas em AngularJS --><style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).only=e;window.dispatchEvent(new Event("astro:only"));})();;(()=>{var b=Object.defineProperty;var f=(c,o,i)=>o in c?b(c,o,{enumerable:!0,configurable:!0,writable:!0,value:i}):c[o]=i;var l=(c,o,i)=>(f(c,typeof o!="symbol"?o+"":o,i),i);var p;{let c={0:t=>m(t),1:t=>i(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(i(t)),5:t=>new Set(i(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t)},o=t=>{let[e,r]=t;return e in c?c[e](r):void 0},i=t=>t.map(o),m=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([e,r])=>[e,o(r)]));customElements.get("astro-island")||customElements.define("astro-island",(p=class extends HTMLElement{constructor(){super(...arguments);l(this,"Component");l(this,"hydrator");l(this,"hydrate",async()=>{var d;if(!this.hydrator||!this.isConnected)return;let e=(d=this.parentElement)==null?void 0:d.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let r=this.querySelectorAll("astro-slot"),a={},h=this.querySelectorAll("template[data-astro-template]");for(let n of h){let s=n.closest(this.tagName);s!=null&&s.isSameNode(this)&&(a[n.getAttribute("data-astro-template")||"default"]=n.innerHTML,n.remove())}for(let n of r){let s=n.closest(this.tagName);s!=null&&s.isSameNode(this)&&(a[n.getAttribute("name")||"default"]=n.innerHTML)}let u;try{u=this.hasAttribute("props")?m(JSON.parse(this.getAttribute("props"))):{}}catch(n){let s=this.getAttribute("component-url")||"<unknown>",y=this.getAttribute("component-export");throw y&&(s+=` (export ${y})`),console.error(`[hydrate] Error parsing props for component ${s}`,this.getAttribute("props"),n),n}await this.hydrator(this)(this.Component,u,a,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});l(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),r.disconnect(),this.childrenConnectedCallback()},r=new MutationObserver(()=>{var a;((a=this.lastChild)==null?void 0:a.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});r.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}start(){let e=JSON.parse(this.getAttribute("opts")),r=this.getAttribute("client");if(Astro[r]===void 0){window.addEventListener(`astro:${r}`,()=>this.start(),{once:!0});return}Astro[r](async()=>{let a=this.getAttribute("renderer-url"),[h,{default:u}]=await Promise.all([import(this.getAttribute("component-url")),a?import(a):()=>()=>{}]),d=this.getAttribute("component-export")||"default";if(!d.includes("."))this.Component=h[d];else{this.Component=h;for(let n of d.split("."))this.Component=this.Component[n]}return this.hydrator=u,this.hydrate},e,this)}attributeChangedCallback(){this.hydrate()}},l(p,"observedAttributes",["props"]),p))}})();</script><sk-application layout="column" class="dynaform-launcher" ng-controller="ControladoraCentral as central"><astro-island uid="ZiHmRh" component-url="/_astro/Button.bc0140ec.js" component-export="default" renderer-url="/_astro/client.bb1cf6b8.js" props="{}" ssr="" client="only" opts="{&quot;name&quot;:&quot;Button&quot;,&quot;value&quot;:true}"></astro-island><!-- Componente responsavel pela montagem automatica da grade e formulario vinculado a entidade --><sk-dynaform flex="true" layout="column" sk-entity-name="{{ central.nomeEntidade }}" sk-on-dynaform-loaded="central.aoCarregarDynaform (dynaform, dataset)" sk-skip-start-page="true" sk-disable-tour="true" sk-enable-toolpanel="true" sk-show-edit-button="true" sk-hide-buttons-config="false" sk-hide-button-favorite="false" sk-hide-button-recents="false" sk-hide-entity-card="false" sk-hide-button-entity-attach="false" sk-hide-entity-search-field="false"></sk-dynaform></sk-application><!-- --></body></body></html>
