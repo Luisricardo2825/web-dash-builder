@@ -18,8 +18,8 @@ use crate::config_schema::{ConfigSchema, Jsp};
 
 fn main() {
   build_internal(Some(Either::A(ConfigSchema {
-    out_dir: Some("build".to_owned()),
-    src: Some("out".to_owned()),
+    out_dir: None,
+    src: None,
     jsp: None,
   })));
 }
@@ -85,7 +85,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
       treat_dyn_assets_path(&file);
     }
   }
-
+  
   let mut custom_jsp_header: Vec<String> = vec![header::get().to_string()];
   let mut custom_jsp_content: Vec<String> = vec![];
   let mut custom_jsp_variables: Vec<String> = vec![];
@@ -161,6 +161,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
 
   let mut path = Path::new(&out_path).to_path_buf();
 
+  println!("{:?}",&path);
   // Read html file
   let mut file = match fs::read_to_string(&path) {
     Ok(res) => res,
@@ -172,11 +173,14 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
       return false;
     }
   };
+
+
+
+
   file.insert_str(0, &custom_jsp_header.join("\n"));
 
   // Set a new extension for HTML file to create it as JSP
   path.set_extension("jsp");
-
   // Uses regex to get the <head> tag from html file
   let re = Regex::new(r"<head>[.\s\S]*?<\/head>").unwrap();
   let caps = match re.captures(&file) {
@@ -324,16 +328,24 @@ fn treat_asset_path<P: AsRef<Path>>(path: P) -> bool {
       file.write_all(result.as_bytes()).unwrap();
     } else if extension == "html" {
       let cont = content.clone();
-      let matchs = regex.captures_iter(&cont);
-      for mat in matchs {
-        let value = mat.get(1).unwrap().as_str();
+      let mut matchs = regex.captures_iter(&cont);
+
+      loop {
+        let mat = &mut matchs.next();  
+        if mat.is_none() {
+          file.write_all(content.as_bytes()).unwrap(); 
+          break;
+        }
+        let mat_some = mat.as_ref().unwrap();
+        let value = mat_some.get(1).unwrap().as_str();
         let new_value = format!(
           "${{BASE_FOLDER}}{}",
-          mat.get(1).unwrap().as_str().replace("\"", "")
+          mat_some.get(1).unwrap().as_str().replace("\"", "")
         );
         content = content.replace(value, &new_value);
-        file.write_all(content.as_bytes()).unwrap();
+        file.write_all(content.as_bytes()).unwrap(); 
       }
+   
     } else {
       file.write_all(content.as_bytes()).unwrap();
     }

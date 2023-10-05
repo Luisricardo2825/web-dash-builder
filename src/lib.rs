@@ -321,12 +321,19 @@ fn treat_asset_path<P: AsRef<Path>>(path: P) -> bool {
       file.write_all(result.as_bytes()).unwrap();
     } else if extension == "html" {
       let cont = content.clone();
-      let matchs = regex.captures_iter(&cont);
-      for mat in matchs {
-        let value = mat.get(1).unwrap().as_str();
+      let mut matchs = regex.captures_iter(&cont);
+
+      loop {
+        let mat = &mut matchs.next();
+        if mat.is_none() {
+          file.write_all(content.as_bytes()).unwrap();
+          break;
+        }
+        let mat_some = mat.as_ref().unwrap();
+        let value = mat_some.get(1).unwrap().as_str();
         let new_value = format!(
           "${{BASE_FOLDER}}{}",
-          mat.get(1).unwrap().as_str().replace("\"", "")
+          mat_some.get(1).unwrap().as_str().replace("\"", "")
         );
         content = content.replace(value, &new_value);
         file.write_all(content.as_bytes()).unwrap();
