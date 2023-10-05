@@ -26,9 +26,9 @@ class ControladoraCentral {
     /** **/
     JX.removerFrame({
       paginaInicial:
-        "paginas/entidade/index.jsp" /** Local da pagina inicial(nao use BASE_FOLDER) **/,
+        "index.jsp" /** Local da pagina inicial(nao use BASE_FOLDER) **/,
       instancia:
-        "TELA_HTML5" /** Nome EXATO (case sensitive) do Componente BI **/,
+        "ASTRO" /** Nome EXATO (case sensitive) do Componente BI **/,
     });
     /** **/
 

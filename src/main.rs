@@ -355,9 +355,10 @@ fn treat_asset_path<P: AsRef<Path>>(path: P) -> bool {
 
 fn treat_dyn_assets_path<P: AsRef<Path>>(path: P) -> bool {
   let regex = Regex::new(
-    r#"(?i)\s*('[^\.\/][^']+\.(js|css)'|"[^\.\/][^"]+\.(js|css)"|`[^\.\/][^`]+\.(js|css)`)\s*"#,
+    r#"(?mi)\s*('[^\.\/][^']+\.(js|css)'|"[^\.\/][^"]+\.(js|css)"|`[^\.\/][^`]+\.(js|css)`)\s*"#,
   )
   .unwrap();
+
   let path_ = path.as_ref();
   let extension = path_.extension();
   let content = match fs::read_to_string(&path_) {
@@ -369,11 +370,30 @@ fn treat_dyn_assets_path<P: AsRef<Path>>(path: P) -> bool {
   };
 
   if extension.is_some() {
+    let mut matchs = regex.captures_iter(&content);
     let extension = extension.unwrap().to_str().unwrap();
     let mut file = File::create(&path_).unwrap();
     if extension == "js" {
-      let substitution = "(window.resolveAsset($1))";
-      let result = regex.replace_all(&content, substitution);
+      let mut result = content.to_owned();
+      loop {
+        let mat = &mut matchs.next();
+        if mat.is_none() {
+          file.write_all(content.as_bytes()).unwrap();
+          break;
+        }
+        let mat_some = mat.as_ref().unwrap();
+        let value = mat_some.get(1).unwrap().as_str();
+        println!("{value}");
+
+        // Ignore if it is a link
+        if !value.starts_with("\"https") || !value.starts_with("\"http") {
+          let new_value = format!(
+            "(window.resolveAsset({}))",
+            mat_some.get(1).unwrap().as_str()
+          );
+          result = result.replace(value, &new_value);
+        }
+      }
       file.write_all(result.as_bytes()).unwrap();
     } else {
       file.write_all(content.as_bytes()).unwrap();
