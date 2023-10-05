@@ -347,7 +347,7 @@ fn treat_asset_path<P: AsRef<Path>>(path: P) -> bool {
 
 fn treat_dyn_assets_path<P: AsRef<Path>>(path: P) -> bool {
   let regex = Regex::new(
-    r#"(?i)\s*('[^\.\/][^']+\.(js|css)'|"[^\.\/][^"]+\.(js|css)"|`[^\.\/][^`]+\.(js|css)`)\s*"#,
+    r#"\s*('[^https][^\.\/][^']+\.(js|css)'|"[^https][^\.\/][^"]+\.(js|css)"|`[^https][^\.\/][^`]+\.(js|css)`)\s*"#,
   )
   .unwrap();
   let path_ = path.as_ref();
