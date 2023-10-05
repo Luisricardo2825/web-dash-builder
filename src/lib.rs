@@ -375,7 +375,6 @@ fn treat_dyn_assets_path<P: AsRef<Path>>(path: P) -> bool {
         }
         let mat_some = mat.as_ref().unwrap();
         let value = mat_some.get(1).unwrap().as_str();
-        println!("{value}");
 
         // Ignore if it is a link
         if !value.starts_with("\"https") || !value.starts_with("\"http") {
@@ -385,8 +384,8 @@ fn treat_dyn_assets_path<P: AsRef<Path>>(path: P) -> bool {
           );
           result = result.replace(value, &new_value);
         }
+        file.write_all(result.as_bytes()).unwrap();
       }
-      file.write_all(result.as_bytes()).unwrap();
     } else {
       file.write_all(content.as_bytes()).unwrap();
     }

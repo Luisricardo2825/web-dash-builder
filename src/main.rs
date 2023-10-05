@@ -18,12 +18,11 @@ use crate::config_schema::{ConfigSchema, Jsp};
 
 fn main() {
   build_internal(Some(Either::A(ConfigSchema {
-    out_dir: None,
-    src: None,
+    out_dir: Some("./dist".to_string()),
+    src: Some("./build".to_string()),
     jsp: None,
   })));
 }
-
 
 fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   let ConfigSchema {
@@ -85,7 +84,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
       treat_dyn_assets_path(&file);
     }
   }
-  
+
   let mut custom_jsp_header: Vec<String> = vec![header::get().to_string()];
   let mut custom_jsp_content: Vec<String> = vec![];
   let mut custom_jsp_variables: Vec<String> = vec![];
@@ -161,7 +160,6 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
 
   let mut path = Path::new(&out_path).to_path_buf();
 
-  println!("{:?}",&path);
   // Read html file
   let mut file = match fs::read_to_string(&path) {
     Ok(res) => res,
@@ -173,9 +171,6 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
       return false;
     }
   };
-
-
-
 
   file.insert_str(0, &custom_jsp_header.join("\n"));
 
@@ -331,9 +326,9 @@ fn treat_asset_path<P: AsRef<Path>>(path: P) -> bool {
       let mut matchs = regex.captures_iter(&cont);
 
       loop {
-        let mat = &mut matchs.next();  
+        let mat = &mut matchs.next();
         if mat.is_none() {
-          file.write_all(content.as_bytes()).unwrap(); 
+          file.write_all(content.as_bytes()).unwrap();
           break;
         }
         let mat_some = mat.as_ref().unwrap();
@@ -343,9 +338,8 @@ fn treat_asset_path<P: AsRef<Path>>(path: P) -> bool {
           mat_some.get(1).unwrap().as_str().replace("\"", "")
         );
         content = content.replace(value, &new_value);
-        file.write_all(content.as_bytes()).unwrap(); 
+        file.write_all(content.as_bytes()).unwrap();
       }
-   
     } else {
       file.write_all(content.as_bytes()).unwrap();
     }
@@ -383,7 +377,6 @@ fn treat_dyn_assets_path<P: AsRef<Path>>(path: P) -> bool {
         }
         let mat_some = mat.as_ref().unwrap();
         let value = mat_some.get(1).unwrap().as_str();
-        println!("{value}");
 
         // Ignore if it is a link
         if !value.starts_with("\"https") || !value.starts_with("\"http") {
@@ -393,8 +386,8 @@ fn treat_dyn_assets_path<P: AsRef<Path>>(path: P) -> bool {
           );
           result = result.replace(value, &new_value);
         }
+        file.write_all(result.as_bytes()).unwrap();
       }
-      file.write_all(result.as_bytes()).unwrap();
     } else {
       file.write_all(content.as_bytes()).unwrap();
     }
