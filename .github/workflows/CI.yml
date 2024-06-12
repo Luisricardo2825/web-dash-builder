@@ -48,7 +48,7 @@ jobs:
         uses: actions/setup-node@v3
         if: ${{ !matrix.settings.docker }}
         with:
-          node-version: latest
+          node-version: 20
           check-latest: true
           cache: yarn
       - name: Install
@@ -85,7 +85,7 @@ jobs:
         uses: actions/setup-node@v3
         if: matrix.settings.target == 'i686-pc-windows-msvc'
         with:
-          node-version: latest
+          node-version: 20
           check-latest: true
           cache: yarn
           architecture: x86
@@ -119,9 +119,7 @@ jobs:
           - host: windows-latest
             target: x86_64-pc-windows-msvc
         node:
-          - '18'
           - '20'
-          - 'latest'
     runs-on: ${{ matrix.settings.host }}
     steps:
       - uses: actions/checkout@v3
@@ -151,9 +149,7 @@ jobs:
       fail-fast: false
       matrix:
         node:
-          - '18'
           - '20'
-          - 'latest'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -186,7 +182,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: latest
+          node-version: 20
           check-latest: true
           cache: yarn
       - name: Install dependencies
