@@ -8,21 +8,9 @@ export interface ConfigSchema {
   outDir?: string
   jsp?: Array<Jsp>
 }
-export interface ConfigSchema {
-  src?: string
-  outDir?: string
-  jsp?: Array<Jsp>
-}
 export interface Jsp {
   typeField: string
   code?: string
   path?: string
   varName?: string
 }
-export interface Jsp {
-  typeField: string
-  code?: string
-  path?: string
-  varName?: string
-}
-export function build(arg?: ConfigSchema | string | undefined | null): boolean
