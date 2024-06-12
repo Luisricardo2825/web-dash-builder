@@ -229,9 +229,6 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   };
 
   let html_str = html_minifier.get_html();
-  // Convert html_str to string
-  let string_html = String::from_utf8(html_str.to_vec());
-  // println!("{}", string_html.unwrap());
   // Write minified HTML into the JSP file
   match fs::write(&path, html_str) {
     Ok(_) => {
