@@ -11,10 +11,8 @@
   "files": [
     "web-dash-builder.win32-x64-msvc.node"
   ],
-  "description": "CLI for dash building",
   "license": "MIT",
   "engines": {
-    "node": ">= 16"
-  },
-  "repository": "https://github.com/Luisricardo2825/web-dash-builder"
+    "node": ">= 10"
+  }
 }
