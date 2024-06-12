@@ -79,8 +79,15 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   for file in files {
     // File extension
     let extension = file.extension().unwrap_or_default().to_str().unwrap();
-    if ["js", "JS", "html", "HTML", "CSS", "css", "json", "JSON"].contains(&extension) {
+    let ext = extension.to_lowercase();
+    if ["js", "html", "css", "json"].contains(&ext.as_str()) {
       treat_asset_path(&file);
+      if extension.to_lowercase() == "html" {
+        // println!(
+        //   "String: {}\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+        //   fs::read_to_string(&file).unwrap()
+        // );
+      }
       treat_dyn_assets_path(&file);
     }
   }
@@ -199,6 +206,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
     header_str.as_str(),
     ("<head>\n".to_owned() + &new_header).as_str(),
   );
+
   //Replace href attr of link tag
   let regex = Regex::new(r#"([\w\S]*)\=(\"|')(\.?\/+[\w\s\#\/\-\.]+)(\"|')"#).unwrap();
   let substitution = "$1=\"$${BASE_FOLDER}$3\"";
@@ -220,8 +228,12 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
     }
   };
 
+  let html_str = html_minifier.get_html();
+  // Convert html_str to string
+  let string_html = String::from_utf8(html_str.to_vec());
+  // println!("{}", string_html.unwrap());
   // Write minified HTML into the JSP file
-  match fs::write(&path, html_minifier.get_html()) {
+  match fs::write(&path, html_str) {
     Ok(_) => {
       println!("Minified HTML written into the JSP file");
     }
@@ -286,11 +298,15 @@ fn read_config_from_file<P: AsRef<Path>>(path: P) -> Result<ConfigSchema, Box<dy
 }
 
 fn recurse(path: impl AsRef<Path>) -> Vec<PathBuf> {
-  let Ok(entries) = read_dir(path) else { return vec![] };
+  let Ok(entries) = read_dir(path) else {
+    return vec![];
+  };
   entries
     .flatten()
     .flat_map(|entry| {
-      let Ok(meta) = entry.metadata() else { return vec![] };
+      let Ok(meta) = entry.metadata() else {
+        return vec![];
+      };
       if meta.is_dir() {
         return recurse(entry.path());
       }
@@ -324,11 +340,13 @@ fn treat_asset_path<P: AsRef<Path>>(path: P) -> bool {
     } else if extension == "html" {
       let cont = content.clone();
       let mut matchs = regex.captures_iter(&cont);
-
+      let total_matchs = regex.captures_iter(&cont).count();
       loop {
         let mat = &mut matchs.next();
         if mat.is_none() {
-          file.write_all(content.as_bytes()).unwrap();
+          if total_matchs == 0 {
+            file.write_all(content.as_bytes()).unwrap();
+          }
           break;
         }
         let mat_some = mat.as_ref().unwrap();

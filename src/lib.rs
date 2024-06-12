@@ -322,11 +322,13 @@ fn treat_asset_path<P: AsRef<Path>>(path: P) -> bool {
     } else if extension == "html" {
       let cont = content.clone();
       let mut matchs = regex.captures_iter(&cont);
-
+      let total_matchs = regex.captures_iter(&cont).count();
       loop {
         let mat = &mut matchs.next();
         if mat.is_none() {
-          file.write_all(content.as_bytes()).unwrap();
+          if total_matchs == 0 {
+            file.write_all(content.as_bytes()).unwrap();
+          }
           break;
         }
         let mat_some = mat.as_ref().unwrap();
