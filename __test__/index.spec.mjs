@@ -7,7 +7,7 @@ test("Build", async (t) => {
     build({
       jsp: [],
       outDir: "dist",
-      src: "D:\\Repositorios\\pdvpintos\\build",
+      src: "./build",
     }),
     true
   );
