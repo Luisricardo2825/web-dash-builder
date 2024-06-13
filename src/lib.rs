@@ -22,7 +22,6 @@ pub fn build(arg: Option<Either<ConfigSchema, String>>) -> bool {
   return build_internal(arg);
 }
 
-
 fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   let ConfigSchema {
     mut src,
@@ -76,9 +75,12 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   let files = recurse(&out_path);
 
   for file in files {
-    treat_asset_path(&file);
-    // treat_import_path(&file);
-    treat_dyn_assets_path(&file);
+    // File extension
+    let extension = file.extension().unwrap_or_default().to_str().unwrap();
+    if ["js", "JS", "html", "HTML", "CSS", "css", "json", "JSON"].contains(&extension) {
+      treat_asset_path(&file);
+      treat_dyn_assets_path(&file);
+    }
   }
 
   let mut custom_jsp_header: Vec<String> = vec![header::get().to_string()];
@@ -161,23 +163,21 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
     Ok(res) => res,
     Err(_) => {
       eprintln!(
-        "Could not find index.html in the build directory: {}",
+        "Could not find index.html in the directory: {}",
         &path.display()
       );
       return false;
     }
   };
-  file.insert_str(0, &custom_jsp_header.join("\n"));
 
   // Set a new extension for HTML file to create it as JSP
   path.set_extension("jsp");
-
   // Uses regex to get the <head> tag from html file
-  let re = Regex::new(r"<head>[.\s\S]*?</head>").unwrap();
+  let re = Regex::new(r"<head>[.\s\S]*?<\/head>").unwrap();
   let caps = match re.captures(&file) {
     Some(res) => res,
     None => {
-      eprintln!("Could not find <head> tag in the index.html file");
+      eprintln!("Could not find <head> tag in the file: {}", &path.display());
       return false;
     }
   };
@@ -198,12 +198,14 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
     ("<head>\n".to_owned() + &new_header).as_str(),
   );
   //Replace href attr of link tag
-  let regex = Regex::new(r#"(src|href)\=(\"|')(\.?\/+[\w\s\#\/\-\.]+)?(\"|')"#).unwrap();
+  let regex = Regex::new(r#"([\w\S]*)\=(\"|')(\.?\/+[\w\s\#\/\-\.]+)(\"|')"#).unwrap();
   let substitution = "$1=\"$${BASE_FOLDER}$3\"";
 
   // result will be a String with the substituted value
   let result = regex.replace_all(&file, substitution);
   file = result.to_string();
+  file.insert_str(0, &custom_jsp_header.join("\n"));
+
   // Minify HTML
   let mut html_minifier = HTMLMinifier::new();
   match html_minifier.digest(&file) {
@@ -235,7 +237,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
     }
   };
   zip_file_path.set_extension("zip");
-  let zip_file = File::create(zip_file_path).unwrap();
+  let zip_file = File::create(&zip_file_path).unwrap();
   let mut zip = ZipWriter::new(zip_file);
   out_path = out_path.parent().unwrap().to_path_buf();
   let result = zip.create_from_directory(&out_path);
@@ -246,7 +248,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
     return false;
   }
 
-  println!("Created zip file: dist.zip");
+  println!("Created zip file: {:?}", &zip_file_path);
 
   return true;
 }
