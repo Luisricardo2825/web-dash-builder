@@ -6,6 +6,7 @@ version = "0.0.0"
 
 [lib]
 crate-type = ["cdylib"]
+path = "src/lib.rs"
 
 [[bin]]
 name = "bin"

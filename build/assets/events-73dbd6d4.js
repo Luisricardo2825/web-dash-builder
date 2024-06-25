@@ -1,1 +1,0 @@
-import{c as a}from"./index-d21c8685.js";const[u,t]=a("mantine-notifications"),e=t("show"),n=t("hide"),i=t("clean"),o=t("cleanQueue"),s=t("update"),f={show:e,hide:n,clean:i,cleanQueue:o,update:s};export{o as a,s as b,i as c,n as h,f as n,e as s,u};
