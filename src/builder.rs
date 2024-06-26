@@ -1,5 +1,6 @@
 use std::{
   error::Error,
+  fmt::format,
   fs::{self, read_dir, File},
   io::{self, BufReader, Write},
   path::{Path, PathBuf},
@@ -107,7 +108,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
       }
       if code.is_some() {
         let code = ele.code.as_ref().unwrap().to_owned();
-        custom_jsp_content.push(code);
+        custom_jsp_content.push(format!("eval(`{}`)", code));
       }
     }
     if type_field.to_uppercase() == "HEADER" {
@@ -125,7 +126,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
       }
       if code.is_some() {
         let code = ele.code.as_ref().unwrap().to_owned();
-        custom_jsp_header.push(code);
+        custom_jsp_header.push(format!("eval(`{}`)", code));
       }
     }
     if type_field.to_uppercase() == "VARIABLE" {
@@ -140,12 +141,12 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
           }
         };
         let var_name = ele.var_name.as_ref().unwrap();
-        custom_jsp_variables.push(format!("var {}={};", var_name, code));
+        custom_jsp_variables.push(format!("var {}={};", var_name, format!("eval(`{}`)", code)));
       }
       if code.is_some() {
         let code = ele.code.as_ref().unwrap().to_owned();
         let var_name = ele.var_name.as_ref().unwrap();
-        custom_jsp_variables.push(format!("var {}={};", var_name, code));
+        custom_jsp_variables.push(format!("var {}={};", var_name, format!("eval(`{}`)", code)));
       }
     }
 
