@@ -29,9 +29,7 @@ pub fn get() -> String {
             return url;
         }
       };
-      window.dbDialect = eval(
-        "<%=EntityFacadeFactory.getDWFFacade().getJdbcWrapper().getDataSource().getConnection().getMetaData().getDatabaseProductName()%>"
-      );
+      window.dbDialect = "<%=EntityFacadeFactory.getDWFFacade().getJdbcWrapper().getDataSource().getConnection().getMetaData().getDatabaseProductName()%>"
   </script>
   };
 
