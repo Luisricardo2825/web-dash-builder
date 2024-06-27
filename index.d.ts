@@ -5,6 +5,7 @@ export function plugin(options?: {
   prodConfig?: ConfigSchema;
 }): Plugin[];
 
+export function build(options?: ConfigSchema): boolean;
 export declare interface Window {
   __IP_SERVER__: string;
 }

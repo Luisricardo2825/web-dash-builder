@@ -1,6 +1,5 @@
 use std::{
   error::Error,
-  fmt::format,
   fs::{self, read_dir, File},
   io::{self, BufReader, Write},
   path::{Path, PathBuf},
@@ -31,19 +30,19 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
       Either::A(config) => config,
       Either::B(file_path) => read_config_from_file(file_path).unwrap_or(ConfigSchema {
         src: Option::Some("./dist".to_owned()),
-        out_dir: Option::Some("./snk".to_owned()),
+        out_dir: Option::Some("./SankhyaBuild".to_owned()),
         jsp: Option::None,
       }),
     }
   } else {
     read_config_from_file("./wdb.json".to_owned()).unwrap_or(ConfigSchema {
       src: Option::Some("./dist".to_owned()),
-      out_dir: Option::Some("./snk".to_owned()),
+      out_dir: Option::Some("./SankhyaBuild".to_owned()),
       jsp: Option::None,
     })
   };
   src = Option::Some(src.unwrap_or("./dist".to_owned()));
-  out_dir = Option::Some(out_dir.unwrap_or("./snk".to_owned()));
+  out_dir = Option::Some(out_dir.unwrap_or("./SankhyaBuild".to_owned()));
   let mut out_path = Path::new(&out_dir.unwrap()).to_path_buf();
   let src_path = Path::new(&src.unwrap()).to_path_buf();
   // Copy the whole build directory to dist
@@ -81,7 +80,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
     }
   }
 
-  let mut custom_jsp_header: Vec<String> = vec![header::get().to_string()];
+  let mut custom_jsp_header: Vec<String> = vec![header::get()];
   let mut custom_jsp_content: Vec<String> = vec![];
   let mut custom_jsp_variables: Vec<String> = vec![];
 
@@ -108,7 +107,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
       }
       if code.is_some() {
         let code = ele.code.as_ref().unwrap().to_owned();
-        custom_jsp_content.push(format!("eval(`{}`)", code));
+        custom_jsp_content.push(code);
       }
     }
     if type_field.to_uppercase() == "HEADER" {
@@ -126,7 +125,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
       }
       if code.is_some() {
         let code = ele.code.as_ref().unwrap().to_owned();
-        custom_jsp_header.push(format!("eval(`{}`)", code));
+        custom_jsp_header.push(code);
       }
     }
     if type_field.to_uppercase() == "VARIABLE" {
@@ -141,12 +140,12 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
           }
         };
         let var_name = ele.var_name.as_ref().unwrap();
-        custom_jsp_variables.push(format!("var {}={};", var_name, format!("eval(`{}`)", code)));
+        custom_jsp_variables.push(format!("var {}={};", var_name, code));
       }
       if code.is_some() {
         let code = ele.code.as_ref().unwrap().to_owned();
         let var_name = ele.var_name.as_ref().unwrap();
-        custom_jsp_variables.push(format!("var {}={};", var_name, format!("eval(`{}`)", code)));
+        custom_jsp_variables.push(format!("var {}={};", var_name, code));
       }
     }
 
@@ -183,7 +182,8 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   let header_str = header.to_string();
 
   // Get all custom tags to add at header
-  let mut tags = custom_tags::get().to_vec();
+  let binding = custom_tags::get();
+  let mut tags = vec![binding.as_str()];
   let binding_content = custom_jsp_content.join("\n");
   let binding_variables = format!("<script>{}</script>\n", custom_jsp_variables.join("\n"));
   tags.push(&binding_content);
@@ -208,7 +208,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   let mut html_minifier = HTMLMinifier::new();
   match html_minifier.digest(&file) {
     Ok(_) => {
-      println!("Minified HTML");
+      // println!("Minified HTML");
     }
     Err(_) => {
       eprintln!("Could not minify the HTML");
@@ -219,7 +219,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   // Write minified HTML into the JSP file
   match fs::write(&path, html_minifier.get_html()) {
     Ok(_) => {
-      println!("Minified HTML written into the JSP file");
+      // println!("Minified HTML written into the JSP file");
     }
     Err(_) => {
       eprintln!("Could not write minified HTML into JSP file");
@@ -236,7 +236,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   };
   zip_file_path.set_extension("zip");
   let zip_file = File::create(&zip_file_path).unwrap();
-  let mut zip = ZipWriter::new(zip_file);
+  let zip = ZipWriter::new(zip_file);
   out_path = out_path.parent().unwrap().to_path_buf();
   let result = zip.create_from_directory(&out_path);
 
@@ -246,7 +246,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
     return false;
   }
 
-  println!("Created zip file: {:?}", &zip_file_path);
+  // println!("Created zip file: {:?}", &zip_file_path);
 
   return true;
 }
@@ -368,3 +368,13 @@ fn treat_dyn_assets_path<P: AsRef<Path>>(path: P) -> bool {
   }
   return true;
 }
+
+macro_rules! html {
+  ($($t:tt)*) => {{
+    let regex = regex::Regex::new(r##"(?m)(?:[\s\=]|[^\w\W\D])r#?"([^"]*)"#?"##).unwrap();
+    let result = regex.replace_all(stringify!($($t)*),"`$1`").into_owned();
+    result
+  }}
+}
+
+pub(crate) use html;

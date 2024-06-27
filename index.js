@@ -46,7 +46,7 @@ const BuildDevHtml = (str, host) => {
 };
 
 const DevHtml = () =>
-  `<html lang="en"> <head> <script type="module">import { injectIntoGlobalHook } from "/@react-refresh"; injectIntoGlobalHook(window); window.$RefreshReg$ = () => { }; window.$RefreshSig$ = () => (type) => type;</script> <script type="module" src="/@vite/client"></script> <meta charset="UTF-8"> <link rel="icon" type="image/svg+xml" href="/vite.svg"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Vite + React + TS</title> </head> <body> <div id="root"></div> <script type="module" src="/src/main.tsx"></script> </body> </html>`;
+  `<html lang="en"> <head> <script type="module">import { injectIntoGlobalHook } from "${ipHere}/@react-refresh"; injectIntoGlobalHook(window); window.$RefreshReg$ = () => { }; window.$RefreshSig$ = () => (type) => type;</script> <script type="module" src="/@vite/client"></script> <meta charset="UTF-8"> <link rel="icon" type="image/svg+xml" href="/vite.svg"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Vite + React + TS</title> </head> <body> <div id="root"></div> <script type="module" src="/src/main.tsx"></script> </body> </html>`;
 
 const plugin = (
   options = {
@@ -88,7 +88,7 @@ const plugin = (
             }
             fs.writeFile(
               devFolderPath + "/index.html",
-              BuildDevHtml(DevHtml(), `http://${getIP()}:${port}`),
+              BuildDevHtml(DevHtml(`http://${getIP()}:${port}`), `http://${getIP()}:${port}`),
               (err) => {
                 if (err) throw err;
                 build(devConfig);
