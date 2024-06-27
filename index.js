@@ -21,9 +21,64 @@ function getIP() {
   return results[firstKey][0];
 }
 
-const DevHtml = (host) =>
-  `<html lang="en"> <head> <script type="module">import { injectIntoGlobalHook } from "${host}/@react-refresh"; injectIntoGlobalHook(window); window.$RefreshReg$ = () => { }; window.$RefreshSig$ = () => (type) => type;</script> <script type="module" src="${host}/@vite/client"></script> <meta charset="UTF-8"> <link rel="icon" type="image/svg+xml" href="${host}/vite.svg"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Vite + React + TS</title> </head> <body> <div id="root"></div> <script type="module" src="${host}/src/main.tsx"></script> </body> </html>`;
+const DevHtml = async (host) => {
+  const html = await (await fetch(host)).text();
+  const regex = /(src|href)\s*=\s*(?:\s+|\s*)([`'"])(?<path3>[^`'"]+)[`'"]/g;
+  const regexImport =
+    /(?:(?<=(?:import|export)[^`'"]*from\s+[`'"])(?<path1>[^`'"]+)(?=(?:'|"|`)))|(?:\b(?:import|export)(?:\s+|\s*\(\s*)[`'"](?<path2>[^`'"]+)[`'"])/gm;
+  const regexHead = /(<head.*>)([.\s\S]*?)(<\/head>)/gm;
+  const subst = `$1=$2${host}$3$2`;
+  const substImport = `${host}$1`;
+  const substHead = /*js*/ `$1$2<script type="text/javascript">var __size__nodes = 0;var isDev = ${
+    process.env.node_env == "development"
+  };window.__HOST_IP__ = "${host}";${getAttrFunc.toString()}; setInterval(getAttr, 50);</script>$3`;
 
+  // The substituted value will be contained in the result variable
+  const result = html.replace(regex, subst);
+  const resultImport = result.replace(regexImport, substImport);
+  const resultHead = resultImport.replace(regexHead, substHead);
+  return resultHead;
+};
+
+const getAttrFunc = function getAttr() {
+  var srcNodeList = document.querySelectorAll("[src],[href]");
+  if (__size__nodes < srcNodeList.length) {
+    __size__nodes = srcNodeList.length;
+    for (var i = 0; i < srcNodeList.length; ++i) {
+      var item = srcNodeList[i];
+      var srcValue = item.src;
+      var hrefValue = item.href;
+      if (srcValue !== null) {
+        if (isDev) {
+          if (
+            item.src != undefined &&
+            String(item.src).startsWith(window.location.origin)
+          ) {
+            srcValue =
+              window.__HOST_IP__ + item.src.replace(window.location.origin, "");
+            item.src = srcValue;
+            console.log(srcValue);
+          }
+        }
+      }
+      if (hrefValue !== null) {
+        if (isDev) {
+          if (
+            item.href != undefined &&
+            String(item.href).startsWith(window.location.origin)
+          ) {
+            // Change to match ip __HOST_IP__
+            hrefValue =
+              window.__HOST_IP__ +
+              item.href.replace(window.location.origin, "");
+            item.href = hrefValue;
+            console.log(hrefValue);
+          }
+        }
+      }
+    }
+  }
+};
 const plugin = (
   options = {
     devConfig: {
@@ -43,7 +98,7 @@ const plugin = (
   return [
     {
       name: "build-sankhya", // the name of your custom plugin. Could be anything.
-      writeBundle: () => {
+      writeBundle: (a, b) => {
         console.log("Iniciando build para o sankhya...");
         if (userConfig?.build?.outDir) {
           prodConfig.src = userConfig.build.outDir;
@@ -52,6 +107,9 @@ const plugin = (
         console.log("\nBuild finalizada");
       },
       configureServer(server) {
+        server.httpServer.once("update", (a) => {
+          console.log("Arquivo alterado", a);
+        });
         server.httpServer.once("listening", () => {
           let port = server.config.server.port;
           console.log("Iniciando build para o sankhya...");
@@ -62,19 +120,23 @@ const plugin = (
               devConfig.src = userConfig.build.outDir;
               devFolderPath = userConfig.build.outDir;
             }
-            writeFile(
-              devFolderPath + "/index.html",
-              DevHtml(`http://${getIP()}:${port}`),
-              (err) => {
+            DevHtml(`http://${getIP()}:${port}`).then((html) => {
+              writeFile(devFolderPath + "/index.html", html, (err) => {
                 if (err) throw err;
                 build(devConfig);
-              }
-            );
+              });
+            });
           });
         });
       },
       config(config) {
         userConfig = config;
+        if (config.server) {
+          config.server.host = true;
+        } else
+          config.server = {
+            host: true,
+          };
         if (config.define)
           config.define.__IP_SERVER__ = JSON.stringify(getIP());
         else
