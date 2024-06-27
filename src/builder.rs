@@ -74,8 +74,10 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   for file in files {
     // File extension
     let extension = file.extension().unwrap_or_default().to_str().unwrap();
-    if ["js", "JS", "html", "HTML", "CSS", "css", "json", "JSON"].contains(&extension) {
+    let ext = extension.to_lowercase();
+    if ["js", "html", "css", "json"].contains(&ext.as_str()) {
       treat_asset_path(&file);
+
       treat_dyn_assets_path(&file);
     }
   }
@@ -170,11 +172,14 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   // Set a new extension for HTML file to create it as JSP
   path.set_extension("jsp");
   // Uses regex to get the <head> tag from html file
-  let re = Regex::new(r"<head>[.\s\S]*?<\/head>").unwrap();
+  let re = Regex::new(r"<head>[.\s\S]*?</head>").unwrap();
   let caps = match re.captures(&file) {
     Some(res) => res,
     None => {
-      eprintln!("Could not find <head> tag in the file: {}", &path.display());
+      eprintln!(
+        "Could not find <head> tag in the file: {} {file}",
+        &path.display()
+      );
       return false;
     }
   };
@@ -323,7 +328,12 @@ fn treat_asset_path<P: AsRef<Path>>(path: P) -> bool {
       file.write_all(result.as_bytes()).unwrap();
     } else if extension == "html" {
       let cont = content.clone();
+      let total_matchs = regex.captures_iter(&cont).count();
       let matchs = regex.captures_iter(&cont);
+      if total_matchs <= 0 {
+        file.write_all(content.as_bytes()).unwrap();
+        return true;
+      }
       for mat in matchs {
         let value = mat.get(1).unwrap().as_str();
         let new_value = format!(

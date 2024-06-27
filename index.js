@@ -21,30 +21,8 @@ function getIP() {
   return results[firstKey][0];
 }
 
-const BuildDevHtml = (str, host) => {
-  const regexSrcHref =
-    /(src|href|from)(\\=?|.)("([^https][^\\.\/][^']+)"|'([^https][^\\.\/][^']+)')/gm;
-
-  const regexImport =
-    /(?:(?<=(?:import)[^`'"]*from\s+[`'"])(?<path1>[^`'"]+)(?=(?:'|"|`)))|(?:\b(?:import)(?:\s+|\s*\(\s*)[`'"](?<path2>[^`'"]+)[`'"])/gm;
-
-  const subst = `${host}$1`;
-  //remove / if host contains
-  if (host.charAt(host.length - 1) === "/")
-    host = host.slice(0, host.length - 1);
-
-  const subst2 = `$1$2"${host}$4$5"`;
-  // The substituted value will be contained in the result variable
-  const result = str
-    .replace(regexImport, subst)
-    .replace(/\.\//gm, "")
-    .replace(regexSrcHref, subst2);
-
-  return result;
-};
-
-const DevHtml = (ipLocal) =>
-  `<html lang="en"> <head> <script type="module">import { injectIntoGlobalHook } from "/@react-refresh"; injectIntoGlobalHook(window); window.$RefreshReg$ = () => { }; window.$RefreshSig$ = () => (type) => type;</script> <script type="module" src="/@vite/client"></script> <meta charset="UTF-8"> <link rel="icon" type="image/svg+xml" href="/vite.svg"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Vite + React + TS</title> </head> <body> <div id="root"></div> <script type="module" src="${ipLocal}/src/main.tsx"></script> </body> </html>`;
+const DevHtml = (host) =>
+  `<html lang="en"> <head> <script type="module">import { injectIntoGlobalHook } from "${host}/@react-refresh"; injectIntoGlobalHook(window); window.$RefreshReg$ = () => { }; window.$RefreshSig$ = () => (type) => type;</script> <script type="module" src="${host}/@vite/client"></script> <meta charset="UTF-8"> <link rel="icon" type="image/svg+xml" href="${host}/vite.svg"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Vite + React + TS</title> </head> <body> <div id="root"></div> <script type="module" src="${host}/src/main.tsx"></script> </body> </html>`;
 
 const plugin = (
   options = {
@@ -86,10 +64,7 @@ const plugin = (
             }
             writeFile(
               devFolderPath + "/index.html",
-              BuildDevHtml(
-                DevHtml(`http://${getIP()}:${port}`),
-                `http://${getIP()}:${port}`
-              ),
+              DevHtml(`http://${getIP()}:${port}`),
               (err) => {
                 if (err) throw err;
                 build(devConfig);

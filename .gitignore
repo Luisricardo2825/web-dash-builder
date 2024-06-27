@@ -86,6 +86,7 @@ typings/
 .nuxt
 out
 snk
+SankhyaBuild
 
 # Gatsby files
 .cache/
