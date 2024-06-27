@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const { build } = require("./main.js");
 const { networkInterfaces } = require("os");
-const fs = require("fs");
+const { mkdir, writeFile } = require("fs");
 function getIP() {
   const nets = networkInterfaces();
   const results = Object.create(null); // Or just '{}', an empty object
@@ -22,10 +22,8 @@ function getIP() {
 }
 
 const BuildDevHtml = (str, host) => {
-  const regexSrchref = new RegExp(
-    "(src|href|from)(\\=?|.)(\\\"|')(\\.?\\/+[\\w\\s\\#\\/\\-\\.]+\\.(js|tsx|))?(\\\"|')",
-    "gm"
-  );
+  const regexSrcHref =
+    /(src|href|from)(\\=?|.)("([^https][^\\.\/][^']+)"|'([^https][^\\.\/][^']+)')/gm;
 
   const regexImport =
     /(?:(?<=(?:import)[^`'"]*from\s+[`'"])(?<path1>[^`'"]+)(?=(?:'|"|`)))|(?:\b(?:import)(?:\s+|\s*\(\s*)[`'"](?<path2>[^`'"]+)[`'"])/gm;
@@ -35,18 +33,18 @@ const BuildDevHtml = (str, host) => {
   if (host.charAt(host.length - 1) === "/")
     host = host.slice(0, host.length - 1);
 
-  const subst2 = `$1$2"${host}$4"`;
+  const subst2 = `$1$2"${host}$4$5"`;
   // The substituted value will be contained in the result variable
   const result = str
     .replace(regexImport, subst)
     .replace(/\.\//gm, "")
-    .replace(regexSrchref, subst2);
+    .replace(regexSrcHref, subst2);
 
   return result;
 };
 
-const DevHtml = () =>
-  `<html lang="en"> <head> <script type="module">import { injectIntoGlobalHook } from "/@react-refresh"; injectIntoGlobalHook(window); window.$RefreshReg$ = () => { }; window.$RefreshSig$ = () => (type) => type;</script> <script type="module" src="/@vite/client"></script> <meta charset="UTF-8"> <link rel="icon" type="image/svg+xml" href="/vite.svg"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Vite + React + TS</title> </head> <body> <div id="root"></div> <script type="module" src="/src/main.tsx"></script> </body> </html>`;
+const DevHtml = (ipLocal) =>
+  `<html lang="en"> <head> <script type="module">import { injectIntoGlobalHook } from "/@react-refresh"; injectIntoGlobalHook(window); window.$RefreshReg$ = () => { }; window.$RefreshSig$ = () => (type) => type;</script> <script type="module" src="/@vite/client"></script> <meta charset="UTF-8"> <link rel="icon" type="image/svg+xml" href="/vite.svg"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Vite + React + TS</title> </head> <body> <div id="root"></div> <script type="module" src="${ipLocal}/src/main.tsx"></script> </body> </html>`;
 
 const plugin = (
   options = {
@@ -77,18 +75,21 @@ const plugin = (
       },
       configureServer(server) {
         server.httpServer.once("listening", () => {
-          port = server.config.server.port;
+          let port = server.config.server.port;
           console.log("Iniciando build para o sankhya...");
-          fs.mkdir("./dev", { recursive: true }, (err) => {
+          mkdir("./dev", { recursive: true }, (err) => {
             if (err) throw err;
             let devFolderPath = "dev";
             if (userConfig?.build?.outDir) {
               devConfig.src = userConfig.build.outDir;
               devFolderPath = userConfig.build.outDir;
             }
-            fs.writeFile(
+            writeFile(
               devFolderPath + "/index.html",
-              BuildDevHtml(DevHtml(), `http://${getIP()}:${port}`),
+              BuildDevHtml(
+                DevHtml(`http://${getIP()}:${port}`),
+                `http://${getIP()}:${port}`
+              ),
               (err) => {
                 if (err) throw err;
                 build(devConfig);
@@ -110,8 +111,10 @@ const plugin = (
   ];
 };
 function buildCommand() {
+  // eslint-disable-next-line no-undef
   const args = process.argv.slice(2);
 
+  // eslint-disable-next-line no-useless-escape
   const regex = /--build(\=)?([\w\W]*)?/;
 
   const exec = args.find((item) => regex.test(item));
