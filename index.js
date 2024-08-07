@@ -23,7 +23,7 @@ function getIP() {
 
 const DevHtml = async (host) => {
   const html = await (await fetch(host)).text();
-  const regex = /(src|href)\s*=\s*(?:\s+|\s*)([`'"])(?<path3>[^`'"]+)[`'"]/g;
+  const regex = /(src|href)\s*=\s*(?:\s+|\s*)([`'"])(?<path3>(?!http|https)[^`'"]+)[`'"]/g;
   const regexImport =
     /(?:(?<=(?:import|export)[^`'"]*from\s+[`'"])(?<path1>[^`'"]+)(?=(?:'|"|`)))|(?:\b(?:import|export)(?:\s+|\s*\(\s*)[`'"](?<path2>[^`'"]+)[`'"])/gm;
   const regexHead = /(<head.*>)([.\s\S]*?)(<\/head>)/gm;
