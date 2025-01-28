@@ -14,4 +14,4 @@ export interface Jsp {
   path?: string
   varName?: string
 }
-export function build(arg?: ConfigSchema | string | undefined | null): boolean
+export declare function build(arg?: ConfigSchema | string | undefined | null): boolean

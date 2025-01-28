@@ -378,13 +378,3 @@ fn treat_dyn_assets_path<P: AsRef<Path>>(path: P) -> bool {
   }
   return true;
 }
-
-macro_rules! html {
-  ($($t:tt)*) => {{
-    let regex = regex::Regex::new(r##"(?m)(?:[\s\=]|[^\w\W\D])r#?"([^"]*)"#?"##).unwrap();
-    let result = regex.replace_all(stringify!($($t)*),"`$1`").into_owned();
-    result
-  }}
-}
-
-pub(crate) use html;
