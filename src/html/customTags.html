@@ -23,5 +23,5 @@
         }
         return urlFinal;
     };
-    window.dbDialect = "<%=EntityFacadeFactory.getDWFFacade().getJdbcWrapper().getDataSource().getConnection().getMetaData().getDatabaseProductName()%>"
+    window.dbDialect = "<%= databaseProductName %>"
 </script>

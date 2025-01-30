@@ -8,10 +8,6 @@ version = "0.0.0"
 crate-type = ["cdylib"]
 path = "src/lib.rs"
 
-[[bin]]
-name = "bin"
-path = "src/main.rs"
-
 [dependencies]
 # Default enable napi4 feature, see https://nodejs.org/api/n-api.html#node-api-version-matrix
 napi = { version = "2.16.13", default-features = false, features = ["napi4"] }
