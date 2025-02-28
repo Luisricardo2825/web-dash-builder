@@ -323,7 +323,7 @@ fn treat_asset_path<P: AsRef<Path>>(path: P) -> bool {
     let extension = extension.unwrap().to_str().unwrap();
     let mut file = File::create(&path_).unwrap();
     if extension == "js" {
-      let substitution = "(window.resolveAsset($1))";
+      let substitution = "(window.resolveAssetFullPath($1))";
       let result = regex.replace_all(&content, substitution);
       file.write_all(result.as_bytes()).unwrap();
     } else if extension == "html" {
