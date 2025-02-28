@@ -1,6 +1,6 @@
 {
   "name": "web-dash-builder-win32-x64-msvc",
-  "version": "0.0.36",
+  "version": "0.0.37",
   "os": [
     "win32"
   ],
