@@ -13,3 +13,4 @@ __test__
 renovate.json
 build
 *.zip
+dist
