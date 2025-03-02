@@ -45,7 +45,7 @@ import {build} from "web-dash-builder";
 ```sh
  wdb --build
 ```
-Ou, pode ser especificado o nome do diretorio. Obs: Ainda não é possivel escolher o nome da diretorio de saida
+Ou, pode ser especificado o nome do diretorio. Obs: Ainda não é possivel escolher o nome do diretorio de saida
 
 ```sh
  wdb --build=dist
