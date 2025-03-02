@@ -7,7 +7,6 @@ permissions:
   contents: write
   id-token: write
 'on':
-  workflow_dispatch:
   push:
     branches:
       - master
@@ -134,6 +133,8 @@ jobs:
       - name: List packages
         run: ls -R .
         shell: bash
+      - name: Clone template repo
+        run: git clone https://github.com/Luisricardo2825/dash-template dist
       - name: Test bindings
         run: yarn test
   test-linux-x64-gnu-binding:
@@ -164,6 +165,8 @@ jobs:
       - name: List packages
         run: ls -R .
         shell: bash
+      - name: Clone template repo
+        run: git clone https://github.com/Luisricardo2825/dash-template dist
       - name: Test bindings
         run: docker run --rm -v $(pwd):/build -w /build node:${{ matrix.node }}-slim yarn test
   publish:

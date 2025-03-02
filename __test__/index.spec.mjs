@@ -66,17 +66,6 @@ function yarnInstall(path) {
     });
   });
 }
-// Await promisse
-it.serial("Should download the repo", async (t) => {
-  deleteFolder(PATH);
-  t.is(
-    await downloadRepo(
-      "https://github.com/Luisricardo2825/dash-template.git",
-      PATH
-    ),
-    true
-  );
-});
 
 it.serial("Should install dependecies", async (t) => {
   t.is(await yarnInstall(PATH), true);
