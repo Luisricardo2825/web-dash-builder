@@ -1,10 +1,13 @@
 #!/usr/bin/env node
-const { build } = require("./main.js");
-const { networkInterfaces } = require("os");
-const { mkdir, writeFile } = require("fs");
+/// <reference path="./index.d.ts" />
+import { build } from "./main.cjs";
+import { networkInterfaces } from "os";
+import { mkdir, writeFile } from "fs";
+import path from "path";
+
 function getIP() {
   const nets = networkInterfaces();
-  const results = Object.create(null); // Or just '{}', an empty object
+  const results = Object.create(null);
 
   for (const name of Object.keys(nets)) {
     for (const net of nets[name]) {
@@ -23,17 +26,17 @@ function getIP() {
 
 const DevHtml = async (host) => {
   const html = await (await fetch(host)).text();
-  const regex = /(src|href)\s*=\s*(?:\s+|\s*)([`'"])(?<path3>(?!http|https)[^`'"]+)[`'"]/g;
+  const regex =
+    /(src|href)\s*=\s*(?:\s+|\s*)([`'"])(?<path3>(?!http|https)[^`'"]+)[`'"]/g;
   const regexImport =
     /(?:(?<=(?:import|export)[^`'"]*from\s+[`'"])(?<path1>[^`'"]+)(?=(?:'|"|`)))|(?:\b(?:import|export)(?:\s+|\s*\(\s*)[`'"](?<path2>[^`'"]+)[`'"])/gm;
   const regexHead = /(<head.*>)([.\s\S]*?)(<\/head>)/gm;
   const subst = `$1=$2${host}$3$2`;
   const substImport = `${host}$1`;
-  const substHead = /*js*/ `$1$2<script type="text/javascript">var __size__nodes = 0;var isDev = ${
+  const substHead = `$1$2<script type="text/javascript">var __size__nodes = 0;var isDev = ${
     process.env.node_env == "development"
   };window.__HOST_IP__ = "${host}";${getAttrFunc.toString()}; setInterval(getAttr, 50);</script>$3`;
 
-  // The substituted value will be contained in the result variable
   const result = html.replace(regex, subst);
   const resultImport = result.replace(regexImport, substImport);
   const resultHead = resultImport.replace(regexHead, substHead);
@@ -67,7 +70,6 @@ const getAttrFunc = function getAttr() {
             item.href != undefined &&
             String(item.href).startsWith(window.location.origin)
           ) {
-            // Change to match ip __HOST_IP__
             hrefValue =
               window.__HOST_IP__ +
               item.href.replace(window.location.origin, "");
@@ -79,7 +81,13 @@ const getAttrFunc = function getAttr() {
     }
   }
 };
-const plugin = (
+
+/**
+ * Plugin vite para realizar build do projeto.
+ * @param {import(".").PluginOptions} options - ID do usuário.
+ * @returns {import("vite").PluginOption[]} Retorn o plugin.
+ */
+function plugin(
   options = {
     devConfig: {
       jsp: [],
@@ -92,45 +100,67 @@ const plugin = (
       src: "dist",
     },
   }
-) => {
+) {
   const { devConfig, prodConfig } = options;
-  let userConfig = {};
+  /** @type {import("vite").UserConfig|undefined}  */
+  let userConfig;
+
+  /** @type {import("vite").Logger|undefined}  */
+  let logger;
+  const defaultLogConf = {
+    timestamp: true,
+    clear: true,
+    environment: "build",
+  };
   return [
     {
-      name: "build-sankhya", // the name of your custom plugin. Could be anything.
-      writeBundle: (a, b) => {
-        console.log("Iniciando build para o sankhya...");
+      name: "build-sankhya",
+      writeBundle() {
+        logger?.info("Iniciando build para o sankhya...", defaultLogConf);
         if (userConfig?.build?.outDir) {
           prodConfig.src = userConfig.build.outDir;
         }
-        build(prodConfig);
-        console.log("\nBuild finalizada");
+        let entryFile = userConfig.build.rollupOptions.input.app;
+
+        build(prodConfig, entryFile);
+        logger?.info("Build finalizada", defaultLogConf);
       },
       configureServer(server) {
         server.httpServer.once("update", (a) => {
-          console.log("Arquivo alterado", a);
+          logger?.info(`Arquivo alterado ${a}`, defaultLogConf);
         });
         server.httpServer.once("listening", () => {
           let port = server.config.server.port;
-          console.log("Iniciando build para o sankhya...");
-          mkdir("./dev", { recursive: true }, (err) => {
+          logger?.info("Iniciando build para o sankhya...", defaultLogConf);
+          mkdir(devConfig.src, { recursive: true }, (err) => {
             if (err) throw err;
-            let devFolderPath = "dev";
+            let devFolderPath = devConfig.src;
             if (userConfig?.build?.outDir) {
               devConfig.src = userConfig.build.outDir;
               devFolderPath = userConfig.build.outDir;
             }
+
             DevHtml(`http://${getIP()}:${port}`).then((html) => {
-              writeFile(devFolderPath + "/index.html", html, (err) => {
+              let entryFile = userConfig.build.rollupOptions.input.app;
+
+              // convert entryFile to absoulte path
+              const file = path.join(devFolderPath, entryFile);
+              writeFile(file, html, (err) => {
                 if (err) throw err;
-                build(devConfig);
+                build(devConfig, entryFile);
               });
             });
           });
         });
       },
-      config(config) {
+      configResolved(config) {
+        logger = config.logger;
         userConfig = config;
+
+        if (userConfig?.build?.entryFile) {
+          entryFile = userConfig.build.rollupOptions.input.app;
+        }
+
         if (config.server) {
           config.server.host = true;
         } else
@@ -146,14 +176,11 @@ const plugin = (
       },
     },
   ];
-};
+}
+
 function buildCommand() {
-  // eslint-disable-next-line no-undef
   const args = process.argv.slice(2);
-
-  // eslint-disable-next-line no-useless-escape
-  const regex = /--build(\=)?([\w\W]*)?/;
-
+  const regex = /--build(=)?([\w\W]*)?/;
   const exec = args.find((item) => regex.test(item));
   if (exec) {
     const result = regex.exec(exec);
@@ -171,6 +198,6 @@ function buildCommand() {
     });
   }
 }
+
 buildCommand();
-module.exports.build = build;
-module.exports.plugin = plugin;
+export { build, plugin };

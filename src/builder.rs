@@ -5,7 +5,7 @@ use std::{
   path::{Path, PathBuf},
 };
 
-use html_minifier::HTMLMinifier;
+use minify_html::{minify, Cfg};
 use napi::Either;
 use regex::Regex;
 use zip::ZipWriter;
@@ -16,10 +16,17 @@ use crate::{
   custom_tags, header,
 };
 
-pub fn build(arg: Option<Either<ConfigSchema, String>>) -> bool {
-  return build_internal(arg);
+pub fn build<S: AsRef<str>>(
+  arg: Option<Either<ConfigSchema, String>>,
+  entry_file: Option<S>,
+) -> bool {
+  let entry_file = match entry_file {
+    Some(v) => v.as_ref().to_string(),
+    None => "index.html".to_string(),
+  };
+  return build_internal(arg, entry_file);
 }
-fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
+fn build_internal<S: AsRef<str>>(arg: Option<Either<ConfigSchema, String>>, entry_file: S) -> bool {
   let ConfigSchema {
     mut src,
     mut out_dir,
@@ -41,6 +48,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
       jsp: Option::None,
     })
   };
+  let entry_file = entry_file.as_ref();
   src = Option::Some(src.unwrap_or("./dist".to_owned()));
   out_dir = Option::Some(out_dir.unwrap_or("./SankhyaBuild".to_owned()));
   let mut out_path = Path::new(&out_dir.unwrap()).to_path_buf();
@@ -82,7 +90,8 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
     }
   }
 
-  let mut custom_jsp_header: Vec<String> = vec![header::get()];
+  let default_headers = minify_code(header::get());
+  let mut custom_jsp_header: Vec<String> = vec![default_headers];
   let mut custom_jsp_content: Vec<String> = vec![];
   let mut custom_jsp_variables: Vec<String> = vec![];
 
@@ -153,16 +162,17 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
 
     // let jsp_path = Path::new(&ele.path).to_path_buf();
   }
-  out_path.push("index.html");
+  out_path.push(&entry_file);
 
   let mut path = Path::new(&out_path).to_path_buf();
 
   // Read html file
-  let mut file = match fs::read_to_string(&path) {
+  let mut html_content = match fs::read_to_string(&path) {
     Ok(res) => res,
     Err(_) => {
       eprintln!(
-        "Could not find index.html in the directory: {}",
+        "Could not find {} in the directory: {}",
+        &entry_file,
         &path.display()
       );
       return false;
@@ -173,11 +183,11 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   path.set_extension("jsp");
   // Uses regex to get the <head> tag from html file
   let re = Regex::new(r"<head>[.\s\S]*?</head>").unwrap();
-  let caps = match re.captures(&file) {
+  let caps = match re.captures(&html_content) {
     Some(res) => res,
     None => {
       eprintln!(
-        "Could not find <head> tag in the file: {} {file}",
+        "Could not find <head> tag in the file: {} {html_content}",
         &path.display()
       );
       return false;
@@ -196,7 +206,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
 
   // Insert tags inside header
   let new_header = header_str.replace("<head>", &tags.join("\n"));
-  file = file.replace(
+  html_content = html_content.replace(
     header_str.as_str(),
     ("<head>\n".to_owned() + &new_header).as_str(),
   );
@@ -205,24 +215,15 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   let substitution = "$1=\"$${BASE_FOLDER}$3\"";
 
   // result will be a String with the substituted value
-  let result = regex.replace_all(&file, substitution);
-  file = result.to_string();
-  file.insert_str(0, &custom_jsp_header.join("\n"));
+  let result = regex.replace_all(&html_content, substitution);
+  html_content = result.to_string();
+  html_content.insert_str(0, &custom_jsp_header.join("\n"));
 
   // Minify HTML
-  let mut html_minifier = HTMLMinifier::new();
-  match html_minifier.digest(&file) {
-    Ok(_) => {
-      // println!("Minified HTML");
-    }
-    Err(_) => {
-      eprintln!("Could not minify the HTML");
-      return false;
-    }
-  };
+  let html_minified = minify_code(html_content);
 
   // Write minified HTML into the JSP file
-  match fs::write(&path, html_minifier.get_html()) {
+  match fs::write(&path, html_minified) {
     Ok(_) => {
       // println!("Minified HTML written into the JSP file");
     }
@@ -377,4 +378,15 @@ fn treat_dyn_assets_path<P: AsRef<Path>>(path: P) -> bool {
     }
   }
   return true;
+}
+
+pub fn minify_code<S: AsRef<str>>(code: S) -> String {
+  let code = code.as_ref().as_bytes();
+  let mut cfg = Cfg::new();
+  cfg.minify_js = true;
+  cfg.minify_css = true;
+  cfg.keep_html_and_head_opening_tags = true;
+  cfg.keep_spaces_between_attributes = true;
+  let minified = minify(code, &cfg);
+  return String::from_utf8(minified).unwrap();
 }

@@ -3,6 +3,7 @@
   "version": "0.0.37",
   "main": "index.js",
   "types": "index.d.ts",
+  "type": "module",
   "napi": {
     "name": "web-dash-builder",
     "triples": {}
@@ -15,7 +16,7 @@
   "devDependencies": {
     "@napi-rs/cli": "^2.18.3",
     "ava": "^6.0.1",
-    "vite": "^4.4.9"
+    "vite": "^6.2.0"
   },
   "ava": {
     "timeout": "3m"
@@ -25,7 +26,7 @@
   },
   "scripts": {
     "artifacts": "napi artifacts",
-    "build": "napi build --platform --release --js main.js --dts main.d.ts",
+    "build": "napi build --platform --release --js main.cjs --dts main.d.ts",
     "build:debug": "napi build --platform",
     "prepublishOnly": "napi prepublish -t npm",
     "test": "ava --build",
@@ -41,9 +42,5 @@
     "web-dash-builder-darwin-x64": "0.0.34",
     "web-dash-builder-linux-x64-gnu": "0.0.34",
     "web-dash-builder-win32-x64-msvc": "0.0.34"
-  },
-  "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
   }
 }

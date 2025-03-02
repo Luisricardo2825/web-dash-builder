@@ -1,1 +1,0 @@
-import{j as o}from"./index-0edd9011.js";import{L as i}from"./index-423baf14.js";import{u as t}from"./App-e7e75688.js";function a(){const s=t();return o.jsxs("div",{children:[s.pathname,window.__routes.map(r=>o.jsxs("div",{children:[o.jsx(i,{to:r,children:r}),o.jsx("br",{})]},r))]})}export{a as default};
