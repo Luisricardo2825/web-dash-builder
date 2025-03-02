@@ -56,7 +56,7 @@ function runViteBuild(path) {
 
 function yarnInstall(path) {
   return new Promise((resolve, reject) => {
-    exec("yarn install", { cwd: path }, (error, stdout, stderr) => {
+    exec("yarn install --no-immutable", { cwd: path }, (error, stdout, stderr) => {
       if (error) {
         console.error(`Erro ao executar o comando: ${stderr}`);
         reject(false);
