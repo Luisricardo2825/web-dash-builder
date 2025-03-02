@@ -120,7 +120,7 @@ function plugin(
         if (userConfig?.build?.outDir) {
           prodConfig.src = userConfig.build.outDir;
         }
-        let entryFile = userConfig.build.rollupOptions.input.app;
+        let entryFile = userConfig?.build?.rollupOptions?.input?.app;
 
         build(prodConfig, entryFile);
         logger?.info("Build finalizada", defaultLogConf);
@@ -141,7 +141,7 @@ function plugin(
             }
 
             DevHtml(`http://${getIP()}:${port}`).then((html) => {
-              let entryFile = userConfig.build.rollupOptions.input.app;
+              let entryFile = userConfig?.build?.rollupOptions?.input?.app;
 
               // convert entryFile to absoulte path
               const file = path.join(devFolderPath, entryFile);
@@ -156,10 +156,6 @@ function plugin(
       configResolved(config) {
         logger = config.logger;
         userConfig = config;
-
-        if (userConfig?.build?.entryFile) {
-          entryFile = userConfig.build.rollupOptions.input.app;
-        }
 
         if (config.server) {
           config.server.host = true;
