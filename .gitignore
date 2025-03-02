@@ -87,6 +87,7 @@ typings/
 out
 snk
 SankhyaBuild
+dist
 
 # Gatsby files
 .cache/
