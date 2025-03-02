@@ -60,7 +60,6 @@ const getAttrFunc = function getAttr() {
             srcValue =
               window.__HOST_IP__ + item.src.replace(window.location.origin, "");
             item.src = srcValue;
-            console.log(srcValue);
           }
         }
       }
@@ -74,7 +73,6 @@ const getAttrFunc = function getAttr() {
               window.__HOST_IP__ +
               item.href.replace(window.location.origin, "");
             item.href = hrefValue;
-            console.log(hrefValue);
           }
         }
       }
@@ -135,16 +133,12 @@ function plugin(
           mkdir(devConfig.src, { recursive: true }, (err) => {
             if (err) throw err;
             let devFolderPath = devConfig.src;
-            if (userConfig?.build?.outDir) {
-              devConfig.src = userConfig.build.outDir;
-              devFolderPath = userConfig.build.outDir;
-            }
 
             DevHtml(`http://${getIP()}:${port}`).then((html) => {
               let entryFile = userConfig?.build?.rollupOptions?.input?.app;
 
               // convert entryFile to absoulte path
-              const file = path.join(devFolderPath, entryFile);
+              const file = path.join(devFolderPath, entryFile || "index.html");
               writeFile(file, html, (err) => {
                 if (err) throw err;
                 build(devConfig, entryFile);
