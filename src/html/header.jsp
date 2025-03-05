@@ -1,12 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="UTF-8" isELIgnored ="false"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@ taglib prefix="snk" uri="/WEB-INF/tld/sankhyaUtil.tld" %>
 <%@ page import="br.com.sankhya.jape.EntityFacade" %>
+<%@ page session="true" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ page import="br.com.sankhya.jape.dao.JdbcWrapper" %>
 <%@ page import="br.com.sankhya.modelcore.util.EntityFacadeFactory" %>
-<%@ page import="javax.sql.DataSource" %>
-<%@ page import="java.sql.Connection" %>
-<%@ page import="java.sql.DatabaseMetaData" %>
 
 <% 
     EntityFacade dwfFacade = EntityFacadeFactory.getDWFFacade();

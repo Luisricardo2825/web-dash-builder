@@ -88,6 +88,10 @@ out
 snk
 SankhyaBuild
 dist
+wasm
+wasmSankhya
+pkgs
+wdb.json
 
 # Gatsby files
 .cache/

@@ -14,3 +14,7 @@ renovate.json
 build
 *.zip
 dist
+wasm
+SankhyaBuild
+wasmSankhya
+pkgs

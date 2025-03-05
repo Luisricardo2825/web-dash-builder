@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 /// <reference path="./index.d.ts" />
-import { build } from "./main.cjs";
+
+import { build as build$1 } from "./main.cjs";
 import { networkInterfaces } from "os";
 import { mkdir, writeFile } from "fs";
 import path from "path";
 
+/** @type {import("./index.d.ts").build}  */
+const build = build$1;
 function getIP() {
   const nets = networkInterfaces();
   const results = Object.create(null);
@@ -118,9 +121,8 @@ function plugin(
         if (userConfig?.build?.outDir) {
           prodConfig.src = userConfig.build.outDir;
         }
-        let entryFile = userConfig?.build?.rollupOptions?.input?.app;
 
-        build(prodConfig, entryFile);
+        build(prodConfig);
         logger?.info("Build finalizada", defaultLogConf);
       },
       configureServer(server) {
@@ -135,13 +137,15 @@ function plugin(
             let devFolderPath = devConfig.src;
 
             DevHtml(`http://${getIP()}:${port}`).then((html) => {
-              let entryFile = userConfig?.build?.rollupOptions?.input?.app;
+              let entryFile =
+                userConfig?.build?.rollupOptions?.input?.app ||
+                userConfig?.server?.open;
 
               // convert entryFile to absoulte path
               const file = path.join(devFolderPath, entryFile || "index.html");
               writeFile(file, html, (err) => {
                 if (err) throw err;
-                build(devConfig, entryFile);
+                build(devConfig);
               });
             });
           });
