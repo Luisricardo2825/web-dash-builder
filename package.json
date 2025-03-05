@@ -1,6 +1,6 @@
 {
   "name": "web-dash-builder",
-  "version": "0.0.40",
+  "version": "0.0.41",
   "main": "index.js",
   "types": "index.d.ts",
   "type": "module",
