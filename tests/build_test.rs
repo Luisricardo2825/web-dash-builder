@@ -44,15 +44,11 @@ mod tests {
 
     check_out_dir(out_dir);
 
-    assert_eq!(build_result_2, true)
-  }
-
-  #[test]
-
-  fn test_regex() {
-    let matches = get_jsp_imports(&Path::new("./pkgs/dist/index.jsp"));
+    let matches = get_jsp_imports(&Path::new("./out/snk/index.jsp"));
     let matches = matches.join("\n");
     println!("{}", matches);
+    
+    assert_eq!(build_result_2, true)
   }
 
   fn get_jsp_imports(path: &Path) -> Vec<String> {

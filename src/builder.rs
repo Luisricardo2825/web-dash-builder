@@ -77,17 +77,18 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   for file in files {
     // File extension
     let extension = file.extension().unwrap_or_default().to_str().unwrap();
-    let ext = extension.to_lowercase();
-    if ["js", "html", "jsp", "css", "json"].contains(&ext.as_str()) {
+    let extension = extension.to_lowercase();
+    let extension = extension.as_str();
+    if ["js", "html", "jsp", "css", "json"].contains(&extension) {
       treat_asset_path(&file);
 
-      if ["html", "jsp"].contains(&ext.as_str()) {
+      if ["html", "jsp"].contains(&extension) {
         treat_html_esmodule(&file);
 
         treat_wasm_asset_path(&file);
       }
 
-      if ext == "js" {
+      if extension == "js" {
         treat_dyn_assets_path(&file);
 
         treat_wasm_js_asset_path(&file);
@@ -101,8 +102,9 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   let jsp_custom_code = jsp.unwrap_or(default_jsp_array);
   for file in files {
     let extension = file.extension().unwrap_or_default().to_str().unwrap();
-    let ext = extension.to_lowercase();
-    if ext == "html" {
+    let extension = extension.to_lowercase();
+    let extension = extension.as_str();
+    if ["html", "jsp"].contains(&extension) {
       let mut jsp_file = file.clone();
       jsp_file.set_extension("jsp");
       fs::rename(&file, jsp_file).unwrap();
@@ -125,13 +127,11 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
     return false;
   }
 
-  // println!("Created zip file: {:?}", &zip_file_path);
-
   return true;
 }
 
 fn parse_jsp(jsp: &Vec<Jsp>, file: &str, out_path: &PathBuf) {
-  let default_headers = minify_code(header::get());
+  let default_headers = header::get();
   let mut custom_jsp_header: Vec<String> = vec![default_headers];
   let mut custom_jsp_content: Vec<String> = vec![];
   let mut custom_jsp_variables: Vec<String> = vec![];
@@ -162,9 +162,7 @@ fn parse_jsp(jsp: &Vec<Jsp>, file: &str, out_path: &PathBuf) {
 
   // Write minified HTML into the JSP file
   match fs::write(&path, jsp_minified) {
-    Ok(_) => {
-      // println!("Minified HTML written into the JSP file");
-    }
+    Ok(_) => {}
     Err(_) => {
       panic!(
         "{}",
@@ -197,38 +195,34 @@ fn process_jsp_file(
 
   // Uses regex to get the <head> tag from html file
   let re = Regex::new(r"<head>[.\s\S]*?</head>").unwrap();
-  let caps = match re.captures(&html_content) {
-    Some(res) => res,
-    None => {
-      panic!(
-        "Could not find <head> tag in the file: {} {html_content}",
-        &path.display()
-      );
-    }
-  };
-  let header = caps.get(0).unwrap().as_str();
-  let header_str = header.to_string();
+  let caps = re.captures(&html_content);
 
-  // Get all custom tags to add at header
-  let binding = custom_tags::get();
-  let mut tags = vec![binding.as_str()];
-  let binding_content = custom_jsp_content.join("\n");
-  let binding_content = minify_code(binding_content);
-  let binding_variables = format!("<script>{}</script>\n", custom_jsp_variables.join("\n"));
-  tags.push(&binding_content);
-  tags.push(&binding_variables);
+  if caps.is_some() {
+    let caps = caps.unwrap();
+    let header = caps.get(0).unwrap().as_str();
+    let header_str = header.to_string();
 
-  // Insert tags inside header
-  let new_header = header_str.replace("<head>", &tags.join("\n"));
-  html_content = html_content.replace(
-    header_str.as_str(),
-    ("<head>\n".to_owned() + &new_header).as_str(),
-  );
-  //Replace href attr of link tag
-  html_content = replace_href(custom_jsp_header, html_content);
+    // Get all custom tags to add at header
+    let binding = custom_tags::get();
+    let mut tags = vec![binding.as_str()];
+    let binding_content = custom_jsp_content.join("\n");
+    let binding_variables = format!("<script>{}</script>\n", custom_jsp_variables.join("\n"));
+    tags.push(&binding_content);
+    tags.push(&binding_variables);
+
+    // Insert tags inside header
+    let new_header = header_str.replace("<head>", &tags.join("\n"));
+    html_content = html_content.replace(
+      header_str.as_str(),
+      ("<head>\n".to_owned() + &new_header).as_str(),
+    );
+    //Replace href attr of link tag
+    html_content = replace_href(custom_jsp_header, html_content);
+  }
 
   // Minify HTML
   let html_minified = minify_code(html_content);
+
   return html_minified;
 }
 
@@ -379,7 +373,8 @@ fn treat_asset_path<P: AsRef<Path>>(path: P) -> bool {
   };
 
   if extension.is_some() {
-    let extension = extension.unwrap().to_str().unwrap();
+    let extension = extension.unwrap().to_str().unwrap().to_lowercase();
+    let extension = extension.as_str();
     let mut file = File::create(&path_).unwrap();
     if extension == "js" {
       let substitution = "(window.resolveAssetFullPath($1))";
@@ -452,6 +447,8 @@ fn treat_html_esmodule<P: AsRef<Path>>(path: P) -> bool {
 
   if extension.is_some() {
     let extension = extension.unwrap().to_str().unwrap();
+    let extension = extension.to_lowercase();
+    let extension = extension.as_str();
     let mut file = File::create(&path_).unwrap();
     if ["html", "jsp"].contains(&extension) {
       let substitution = r"$1$2$3./$${BASE_FOLDER}$4$5";
@@ -539,7 +536,6 @@ pub fn minify_code<S: AsRef<str>>(code: S) -> String {
 
   let minified = minify(code, &cfg);
   let minified = String::from_utf8(minified).unwrap();
-  println!("{}", minified);
   return minified;
 }
 
