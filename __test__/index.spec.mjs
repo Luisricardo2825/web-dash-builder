@@ -31,13 +31,11 @@ function deleteFolder(folderPath) {
 }
 
 function runViteBuild(path) {
-  console.log("Iniciando a build do vite");
   return new Promise(async (resolve, reject) => {
     try {
       await vite_build({ root: path, logLevel: "silent" });
       resolve(true);
     } catch (e) {
-      console.log("Erro durante a build:", e);
       reject(false);
     }
   });

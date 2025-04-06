@@ -136,7 +136,7 @@ jobs:
         run: ls -R .
         shell: bash
       - name: Clone template repo
-        run: git clone https://github.com/Luisricardo2825/dash-template dist
+        run: git clone https://github.com/Luisricardo2825/test-tamplate-wdb dist
       - name: Test bindings
         run: yarn test
   test-linux-x64-gnu-binding:
