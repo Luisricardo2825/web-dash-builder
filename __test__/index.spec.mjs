@@ -5,7 +5,6 @@ import { build as vite_build } from "vite";
 import { exec } from "child_process";
 import path from "path";
 const PATH = "./dist";
-
 const dirExist = (dir) => {
   try {
     fs.accessSync(dir, fs.constants.R_OK);
@@ -15,6 +14,17 @@ const dirExist = (dir) => {
   }
 };
 
+function downloadRepo(repoUrl, destination) {
+  return new Promise((resolve, reject) => {
+    exec(`git clone ${repoUrl} ${destination}`, (error, stdout, stderr) => {
+      if (error) {
+        reject(false);
+      } else {
+        resolve(true);
+      }
+    });
+  });
+}
 // delete folder
 function deleteFolder(folderPath) {
   if (fs.existsSync(folderPath)) {
@@ -31,49 +41,49 @@ function deleteFolder(folderPath) {
 }
 
 function runViteBuild(path) {
+  // Run vite build e "path"
   return new Promise(async (resolve, reject) => {
     try {
       await vite_build({ root: path, logLevel: "silent" });
       resolve(true);
     } catch (e) {
+      console.log(e);
       reject(false);
     }
+    // if error
   });
 }
 
 function yarnInstall(path) {
   return new Promise((resolve, reject) => {
-    exec(
-      "yarn install --no-immutable",
-      { cwd: path },
-      (error, stdout, stderr) => {
-        if (error) {
-          console.error(`Erro ao executar o comando: ${stderr}`);
-          reject(false);
-        } else {
-          resolve(true);
-        }
+    exec("yarn install --no-immutable", { cwd: path }, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Erro ao executar o comando: ${stderr}`);
+        reject(false);
+      } else {
+        resolve(true);
       }
-    );
+    });
   });
 }
 
 it.serial("Should install dependecies", async (t) => {
   t.is(await yarnInstall(PATH), true);
 });
-it.serial("Should build the template", async (t) => {
+it.serial("Should build the tamplate", async (t) => {
   t.is(await runViteBuild(PATH), true);
 });
 
 it("Should build and generate the outDir fine", (t) => {
-  deleteFolder("./outDist");
-  const src = path.join(PATH, PATH);
+  deleteFolder("./out");
   t.is(
-    build({
-      jsp: [],
-      src: src,
-      outDir: "./outDist",
-    }),
+    build(
+      {
+        jsp: [],
+        src: path.join(PATH, PATH),
+        outDir: "./out",
+      }
+    ),
     true
   );
 });
@@ -83,7 +93,7 @@ it("Should find the out dir", (t) => {
 });
 
 it("Should find generated zip file", (t) => {
-  t.is(dirExist("./outDist.zip"), true);
+  t.is(dirExist("./out.zip"), true);
 });
 
 it("Should run plugin and return an array with one position only", (t) => {
