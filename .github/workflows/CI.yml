@@ -1,7 +1,8 @@
 name: CI
 env:
   DEBUG: napi:*
-  APP_NAME: package-template
+  APP_NAME: web-dash-builder
+  TEMPLATE_REPO: https://github.com/Luisricardo2825/test-tamplate-wdb
   MACOSX_DEPLOYMENT_TARGET: "10.13"
   CARGO_INCREMENTAL: "1"
 permissions:
@@ -242,6 +243,8 @@ jobs:
       - name: List packages
         run: ls -R .
         shell: bash
+      - name: Clone template repo
+        run: git clone ${{env.TEMPLATE_REPO}} dist
       - name: Test bindings
         run: yarn test
   test-linux-x64-gnu-binding:
@@ -272,6 +275,8 @@ jobs:
       - name: List packages
         run: ls -R .
         shell: bash
+      - name: Clone template repo
+        run: git clone ${{env.TEMPLATE_REPO}} dist
       - name: Test bindings
         run: docker run --rm -v $(pwd):/build -w /build node:${{ matrix.node }}-slim yarn test
   test-linux-x64-musl-binding:
@@ -304,6 +309,8 @@ jobs:
       - name: List packages
         run: ls -R .
         shell: bash
+      - name: Clone template repo
+        run: git clone ${{env.TEMPLATE_REPO}} dist
       - name: Test bindings
         run: docker run --rm -v $(pwd):/build -w /build node:${{ matrix.node }}-alpine yarn test
   test-linux-aarch64-gnu-binding:
@@ -332,6 +339,8 @@ jobs:
           yarn config set supportedArchitectures.cpu "arm64"
           yarn config set supportedArchitectures.libc "glibc"
           yarn install
+      - name: Clone template repo
+        run: git clone ${{env.TEMPLATE_REPO}} dist
       - name: Setup and run tests
         uses: addnab/docker-run-action@v3
         with:
@@ -361,6 +370,8 @@ jobs:
           yarn config set supportedArchitectures.cpu "arm64"
           yarn config set supportedArchitectures.libc "musl"
           yarn install
+      - name: Clone template repo
+        run: git clone ${{env.TEMPLATE_REPO}} dist
       - name: Setup and run tests
         uses: addnab/docker-run-action@v3
         with:
@@ -399,6 +410,8 @@ jobs:
         with:
           platforms: arm
       - run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+      - name: Clone template repo
+        run: git clone ${{env.TEMPLATE_REPO}} dist
       - name: Setup and run tests
         uses: addnab/docker-run-action@v3
         with:
