@@ -2,15 +2,15 @@ use std::{
   env::current_dir,
   error::Error,
   fs::{self, read_dir, File},
-  io::{self, BufReader, Write},
+  io::{self, BufReader, BufWriter, Read, Write},
   path::{Path, PathBuf},
 };
 
 use minify_html::{minify, Cfg};
 use napi::Either;
 use regex::Regex;
-use zip::ZipWriter;
-use zip_extensions::ZipWriterExtensions;
+use walkdir::WalkDir;
+use zip::{write::FileOptions, ZipWriter};
 
 use crate::{
   config_schema::{ConfigSchema, Jsp},
@@ -130,9 +130,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   let mut zip_file_path = out_path.clone();
   zip_file_path.set_extension("zip");
 
-  let zip_file = File::create(&zip_file_path).unwrap();
-  let zip = ZipWriter::new(zip_file);
-  let result = zip.create_from_directory(&out_path);
+  let result = zip_dir(&out_path, &zip_file_path);
 
   // Check if zip was created
   if result.is_err() {
@@ -141,6 +139,34 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   }
 
   return true;
+}
+
+fn zip_dir(src_dir: &Path, zip_path: &Path) -> zip::result::ZipResult<()> {
+  let zip_file = File::create(zip_path)?;
+  let buf_writer = BufWriter::new(zip_file);
+  let mut zip = ZipWriter::new(buf_writer);
+
+  let options: zip::write::FileOptions<()> =
+    FileOptions::default().compression_method(zip::CompressionMethod::Deflated);
+
+  for entry in WalkDir::new(src_dir) {
+    let entry = entry.unwrap();
+    let path = entry.path();
+    let name = path.strip_prefix(src_dir).unwrap();
+
+    if path.is_file() {
+      zip.start_file(name.to_string_lossy(), options)?;
+      let mut f = File::open(path)?;
+      let mut buffer = Vec::new();
+      f.read_to_end(&mut buffer)?;
+      zip.write_all(&buffer)?;
+    } else if path.is_dir() && !name.as_os_str().is_empty() {
+      zip.add_directory(name.to_string_lossy(), options)?;
+    }
+  }
+
+  zip.finish()?;
+  Ok(())
 }
 
 fn parse_jsp(
@@ -222,7 +248,7 @@ fn process_jsp_file(
   //Replace href/src attr of link tag
   html_content = replace_html_assets(html_content);
   html_content.insert_str(0, &custom_jsp_header.join("\n"));
-  
+
   // Uses regex to get the <head> tag from html file
   let re = Regex::new(r"<head>[.\s\S]*?</head>").unwrap();
   let caps = re.captures(&html_content);
@@ -557,13 +583,13 @@ pub fn minify_code<S: AsRef<str>>(code: S) -> String {
   cfg.minify_js = true;
   cfg.minify_css = true;
 
-  cfg.preserve_brace_template_syntax = false;
-  cfg.preserve_chevron_percent_template_syntax = false;
+  cfg.preserve_brace_template_syntax = true;
+  cfg.preserve_chevron_percent_template_syntax = true;
 
   cfg.keep_html_and_head_opening_tags = true;
-  cfg.keep_spaces_between_attributes = true;
+  cfg.allow_removing_spaces_between_attributes = true;
   cfg.keep_closing_tags = true;
-  cfg.do_not_minify_doctype = true;
+  cfg.minify_doctype = true;
 
   let minified = minify(code, &cfg);
   let minified = String::from_utf8(minified).unwrap();
