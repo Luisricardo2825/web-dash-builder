@@ -87,7 +87,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
     let extension = extension.to_lowercase();
     let extension = extension.as_str();
     if ["js", "html", "jsp", "css", "json"].contains(&extension) {
-      treat_asset_path(&file);
+      treat_asset_path(&file, base_folder.clone());
 
       if ["html", "jsp"].contains(&extension) {
         treat_html_esmodule(&file);
@@ -178,11 +178,12 @@ fn parse_jsp(
 ) {
   let headers = header::get();
   let mut custom_jsp_header: Vec<String> = vec![headers];
-  if base_folder.is_some() {
-    let base_folder = base_folder.unwrap();
-    let base_folder = format!(r#"<% String BASE_FOLDER = "{}"; %>"#, base_folder);
-    custom_jsp_header.push(base_folder);
-  }
+  let base_folder = base_folder.unwrap_or("".to_owned());
+  // if !base_folder.is_empty() {
+
+  //   let base_folder = format!(r#"<% String BASE_FOLDER = "{}"; %>"#, base_folder);
+  //   custom_jsp_header.push(base_folder);
+  // }
   let mut custom_jsp_content: Vec<String> = vec![];
   let mut custom_jsp_variables: Vec<String> = vec![];
   let mut out_path = out_path.clone();
@@ -209,6 +210,7 @@ fn parse_jsp(
     custom_jsp_variables,
     custom_jsp_header,
     default_headers,
+    base_folder,
   );
 
   // Write minified HTML into the JSP file
@@ -232,6 +234,7 @@ fn process_jsp_file(
   custom_jsp_variables: Vec<String>,
   custom_jsp_header: Vec<String>,
   default_headers: bool,
+  base_folder: String,
 ) -> String {
   // Read html file
   let mut html_content = match fs::read_to_string(&path) {
@@ -246,7 +249,7 @@ fn process_jsp_file(
   };
 
   //Replace href/src attr of link tag
-  html_content = replace_html_assets(html_content);
+  html_content = replace_html_assets(html_content, &base_folder);
   html_content.insert_str(0, &custom_jsp_header.join("\n"));
 
   // Uses regex to get the <head> tag from html file
@@ -277,6 +280,7 @@ fn process_jsp_file(
       ("<head>\n".to_owned() + &new_header).as_str(),
     );
   }
+  html_content = replace_base_folder_var(&html_content, &base_folder);
 
   // Minify HTML
   let html_minified = minify_code(html_content);
@@ -284,14 +288,32 @@ fn process_jsp_file(
   return html_minified;
 }
 
-fn replace_html_assets(html_content: String) -> String {
+fn replace_html_assets(html_content: String, base_folder: &str) -> String {
   let regex = Regex::new(r#"([\w\S]*)\=(\"|')(\.?\/+[\w\s\#\/\-\.]+)(\"|')"#).unwrap();
-  let substitution = "$1=\"$${BASE_FOLDER}$3\"";
+  let mut substitution = "$1=\"$${BASE_FOLDER}$3\"";
+  let subs = format!("$1=\"{}$3\"", base_folder);
+
+  // replace with base_folder
   let mut html_content = html_content;
+
+  if !base_folder.is_empty() {
+    substitution = subs.as_str();
+  }
   // result will be a String with the substituted value
   let result = regex.replace_all(&html_content, substitution);
   html_content = result.to_string();
   html_content
+}
+
+fn replace_base_folder_var(html_content: &str, base_folder: &str) -> String {
+  let regex = Regex::new(r#"(?m)<%=.?request\.getAttribute\("BASE_FOLDER"\).?%>"#).unwrap();
+
+  if !base_folder.is_empty() {
+    let result = regex.replace_all(html_content, base_folder);
+    result.to_string()
+  } else {
+    html_content.to_owned()
+  }
 }
 
 fn process_custom_jsp(
@@ -417,7 +439,7 @@ fn recurse(path: impl AsRef<Path>) -> Vec<PathBuf> {
     .collect()
 }
 
-fn treat_asset_path<P: AsRef<Path>>(path: P) -> bool {
+fn treat_asset_path<P: AsRef<Path>>(path: P, base_folder: Option<String>) -> bool {
   let regex = Regex::new(r#"(?i)\s*('\.?\/[^']+\.(BMP|JPG|JPEG|GIF|PNG|WEBP|SVG)'|"\.?\/[^"]+\.(BMP|JPG|JPEG|GIF|PNG|WEBP|SVG)"|`\.?\/[^`]+\.(BMP|JPG|JPEG|GIF|PNG|WEBP|SVG)`)\s*"#).unwrap();
   let path_ = path.as_ref();
   let extension = path_.extension();
@@ -447,10 +469,19 @@ fn treat_asset_path<P: AsRef<Path>>(path: P) -> bool {
       }
       for mat in matchs {
         let value = mat.get(1).unwrap().as_str();
-        let new_value = format!(
+        let mut new_value = format!(
           "${{BASE_FOLDER}}{}",
           mat.get(1).unwrap().as_str().replace("\"", "")
         );
+
+        if base_folder.is_some() {
+          let subs = format!(
+            "{}{}",
+            base_folder.clone().unwrap(),
+            mat.get(1).unwrap().as_str().replace("\"", "")
+          );
+          new_value = subs;
+        }
         content = content.replace(value, &new_value);
         file.write_all(content.as_bytes()).unwrap();
       }

@@ -13,7 +13,7 @@ mod tests {
     let build_result = build(Some(Either::A(ConfigSchema {
       out_dir: Some(out_dir.to_owned()),
       src: Some("./pkgs/dist".to_string()),
-      base_folder: Some("/addon-template/html5/build".to_owned()),
+      base_folder: Some("/devutils/html5/build".to_owned()),
       default_headers: Some(false),
       ..Default::default()
     })));
