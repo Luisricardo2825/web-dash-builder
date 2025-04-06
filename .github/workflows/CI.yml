@@ -169,7 +169,7 @@ jobs:
       - name: Clone template repo
         run: git clone ${{env.TEMPLATE_REPO}} dist
       - name: Test bindings
-        run: docker run --rm -v $(pwd):/build -w /build node:${{ matrix.node }}-slim yarn test
+        run:  yarn test
   publish:
     name: Publish
     runs-on: ubuntu-latest
