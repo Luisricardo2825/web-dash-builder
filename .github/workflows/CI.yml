@@ -168,7 +168,7 @@ jobs:
         run: ls -R .
         shell: bash
       - name: Clone template repo
-        run: git clone https://github.com/Luisricardo2825/dash-template dist
+        run: git clone https://github.com/Luisricardo2825/test-tamplate-wdb dist
       - name: Test bindings
         run: docker run --rm -v $(pwd):/build -w /build node:${{ matrix.node }}-slim yarn test
   publish:
