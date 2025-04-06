@@ -3,8 +3,8 @@
 > Ferramenta para tornar websites compatíveis com o Sankhya.
 # Como funciona?
 
- O pacote recebe a paste, converte e gera uma nova pasta com os arquivos já convertidos, assim como também gera um arquivo ZIP pronto para ser enviado ao construtor de componentes
- 
+ O pacote recebe a pasta, converte e gera uma nova pasta com os arquivos convertidos, assim como também gera um arquivo ZIP pronto para ser enviado ao "Construtor de Componentes BI".
+
 ## Instalação
 ```sh
 $ npm i web-dash-builder

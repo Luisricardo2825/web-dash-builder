@@ -1,4 +1,3 @@
-<snk:load></snk:load>
 
 <script type="module">
     var baseFolder = `<%= request.getAttribute("BASE_FOLDER") %>`;

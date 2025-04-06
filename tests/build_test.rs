@@ -13,7 +13,9 @@ mod tests {
     let build_result = build(Some(Either::A(ConfigSchema {
       out_dir: Some(out_dir.to_owned()),
       src: Some("./pkgs/dist".to_string()),
-      jsp: None,
+      base_folder: Some("/addon-template/html5/build".to_owned()),
+      default_headers: Some(false),
+      ..Default::default()
     })));
 
     check_out_dir(out_dir);
@@ -28,7 +30,7 @@ mod tests {
     let build_result_2 = build(Some(Either::A(ConfigSchema {
       out_dir: Some(out_dir.to_owned()),
       src: Some("./pkgs/wasm".to_string()),
-      jsp: None,
+      ..Default::default()
     })));
 
     check_out_dir(out_dir);
@@ -47,7 +49,7 @@ mod tests {
     let matches = get_jsp_imports(&Path::new("./out/snk/index.jsp"));
     let matches = matches.join("\n");
     println!("{}", matches);
-    
+
     assert_eq!(build_result_2, true)
   }
 

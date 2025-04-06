@@ -25,6 +25,8 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
     mut src,
     mut out_dir,
     jsp,
+    default_headers,
+    base_folder,
   } = if arg.is_some() {
     let config = arg.unwrap();
     match config {
@@ -32,18 +34,23 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
       Either::B(file_path) => read_config_from_file(file_path).unwrap_or(ConfigSchema {
         src: None,
         out_dir: None,
-        jsp: Option::None,
+        jsp: None,
+        default_headers: Option::Some(true),
+        base_folder: None,
       }),
     }
   } else {
     read_config_from_file("wdb.json".to_owned()).unwrap_or(ConfigSchema {
       src: Option::Some("./dist".to_owned()),
       out_dir: Option::Some("./SankhyaBuild".to_owned()),
-      jsp: Option::None,
+      jsp: None,
+      default_headers: Option::Some(true),
+      base_folder: None,
     })
   };
 
   // let entry_file = entry_file.as_ref();
+  let default_headers = default_headers.unwrap_or(true);
   src = Option::Some(src.unwrap_or("./dist".to_owned()));
   out_dir = Option::Some(out_dir.unwrap_or("./SankhyaBuild".to_owned()));
   let out_path = Path::new(&out_dir.unwrap()).to_path_buf();
@@ -109,7 +116,13 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
       jsp_file.set_extension("jsp");
       fs::rename(&file, jsp_file).unwrap();
       let file = file.to_str().unwrap();
-      parse_jsp(&jsp_custom_code, file, &out_path);
+      parse_jsp(
+        &jsp_custom_code,
+        file,
+        &out_path,
+        default_headers,
+        base_folder.clone(),
+      );
     }
   }
 
@@ -130,9 +143,20 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   return true;
 }
 
-fn parse_jsp(jsp: &Vec<Jsp>, file: &str, out_path: &PathBuf) {
-  let default_headers = header::get();
-  let mut custom_jsp_header: Vec<String> = vec![default_headers];
+fn parse_jsp(
+  jsp: &Vec<Jsp>,
+  file: &str,
+  out_path: &PathBuf,
+  default_headers: bool,
+  base_folder: Option<String>,
+) {
+  let headers = header::get();
+  let mut custom_jsp_header: Vec<String> = vec![headers];
+  if base_folder.is_some() {
+    let base_folder = base_folder.unwrap();
+    let base_folder = format!(r#"<% String BASE_FOLDER = "{}"; %>"#, base_folder);
+    custom_jsp_header.push(base_folder);
+  }
   let mut custom_jsp_content: Vec<String> = vec![];
   let mut custom_jsp_variables: Vec<String> = vec![];
   let mut out_path = out_path.clone();
@@ -158,6 +182,7 @@ fn parse_jsp(jsp: &Vec<Jsp>, file: &str, out_path: &PathBuf) {
     custom_jsp_content,
     custom_jsp_variables,
     custom_jsp_header,
+    default_headers,
   );
 
   // Write minified HTML into the JSP file
@@ -180,6 +205,7 @@ fn process_jsp_file(
   custom_jsp_content: Vec<String>,
   custom_jsp_variables: Vec<String>,
   custom_jsp_header: Vec<String>,
+  default_headers: bool,
 ) -> String {
   // Read html file
   let mut html_content = match fs::read_to_string(&path) {
@@ -193,6 +219,10 @@ fn process_jsp_file(
     }
   };
 
+  //Replace href/src attr of link tag
+  html_content = replace_html_assets(html_content);
+  html_content.insert_str(0, &custom_jsp_header.join("\n"));
+  
   // Uses regex to get the <head> tag from html file
   let re = Regex::new(r"<head>[.\s\S]*?</head>").unwrap();
   let caps = re.captures(&html_content);
@@ -203,8 +233,12 @@ fn process_jsp_file(
     let header_str = header.to_string();
 
     // Get all custom tags to add at header
-    let binding = custom_tags::get();
-    let mut tags = vec![binding.as_str()];
+    let custom_tags = if default_headers {
+      custom_tags::get_default()
+    } else {
+      custom_tags::get_necessary()
+    };
+    let mut tags = vec![custom_tags.as_str()];
     let binding_content = custom_jsp_content.join("\n");
     let binding_variables = format!("<script>{}</script>\n", custom_jsp_variables.join("\n"));
     tags.push(&binding_content);
@@ -216,8 +250,6 @@ fn process_jsp_file(
       header_str.as_str(),
       ("<head>\n".to_owned() + &new_header).as_str(),
     );
-    //Replace href attr of link tag
-    html_content = replace_href(custom_jsp_header, html_content);
   }
 
   // Minify HTML
@@ -226,14 +258,13 @@ fn process_jsp_file(
   return html_minified;
 }
 
-fn replace_href(custom_jsp_header: Vec<String>, html_content: String) -> String {
+fn replace_html_assets(html_content: String) -> String {
   let regex = Regex::new(r#"([\w\S]*)\=(\"|')(\.?\/+[\w\s\#\/\-\.]+)(\"|')"#).unwrap();
   let substitution = "$1=\"$${BASE_FOLDER}$3\"";
   let mut html_content = html_content;
   // result will be a String with the substituted value
   let result = regex.replace_all(&html_content, substitution);
   html_content = result.to_string();
-  html_content.insert_str(0, &custom_jsp_header.join("\n"));
   html_content
 }
 

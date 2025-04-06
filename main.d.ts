@@ -7,6 +7,8 @@ export interface ConfigSchema {
   src?: string
   outDir?: string
   jsp?: Array<Jsp>
+  defaultHeaders?: boolean
+  baseFolder?: string
 }
 export interface Jsp {
   typeField: string

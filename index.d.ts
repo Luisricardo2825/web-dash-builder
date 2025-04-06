@@ -1,9 +1,9 @@
 import type { ConfigSchema } from "./main";
-import type { Plugin } from "vite";
+import type { PluginOption } from "vite";
 export interface Options {
   devConfig?: ConfigSchema;
   prodConfig?: ConfigSchema;
-};
+}
 
 export declare function plugin(options?: Options): PluginOption[];
 
