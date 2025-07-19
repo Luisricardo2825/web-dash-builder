@@ -1,7 +1,7 @@
 {
   "name": "web-dash-builder",
   "version": "0.0.45",
-  "description": "Template project for writing node package with napi-rs",
+  "description": "CLI for dash building",
   "main": "index.js",
   "repository": {
     "url": "https://github.com/Luisricardo2825/web-dash-builder"

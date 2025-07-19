@@ -1,6 +1,6 @@
 
 [package]
-authors = ["LongYinan <lynweklm@gmail.com>"]
+authors = ["LuisRicardo <luisricardo2825@gmail.com>"]
 edition = "2021"
 name    = "web_dash_builder"
 version = "0.1.0"
