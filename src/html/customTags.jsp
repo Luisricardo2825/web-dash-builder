@@ -1,6 +1,6 @@
 
 <script type="module">
-    var baseFolder = `<%= request.getAttribute("BASE_FOLDER") %>`;
+    var baseFolder = `<%= baseFolder %>`;
     window.dbDialect = "<%= databaseProductName %>"
     // Check if window.baseFolder ends with "/"
     if (baseFolder.slice(-1) != "/") {

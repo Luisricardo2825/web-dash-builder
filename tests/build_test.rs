@@ -20,7 +20,7 @@ mod tests {
 
     check_out_dir(out_dir);
 
-    assert_eq!(build_result, true);
+    assert!(build_result);
   }
 
   #[test]
@@ -35,7 +35,7 @@ mod tests {
 
     check_out_dir(out_dir);
 
-    assert_eq!(build_result_2, true)
+    assert!(build_result_2)
   }
 
   #[test]
@@ -46,11 +46,11 @@ mod tests {
 
     check_out_dir(out_dir);
 
-    let matches = get_jsp_imports(&Path::new("./out/snkOut/index.jsp"));
+    let matches = get_jsp_imports(Path::new("./out/snkOut/index.jsp"));
     let matches = matches.join("\n");
     println!("{}", matches);
 
-    assert_eq!(build_result_2, true)
+    assert!(build_result_2)
   }
 
   fn get_jsp_imports(path: &Path) -> Vec<String> {
@@ -58,20 +58,22 @@ mod tests {
       regex::Regex::new(r"<%@\s*(page|taglib)\s*(import=)?(['][\w.\d*]*[']|[^<%@%>]*)?[^<%@%>]*%>");
 
     // Get all matchs
-    let content = std::fs::read_to_string(path).expect(&format!("Could not read file {path:?}"));
+    let content =
+      std::fs::read_to_string(path).unwrap_or_else(|_| panic!("Could not read file {path:?}"));
     let mut matches = Vec::new();
     for cap in regex.unwrap().captures_iter(&content) {
       matches.push(cap.get(0).unwrap().as_str().to_string());
     }
 
-    return matches;
+    matches
   }
 
   fn check_out_dir(out_dir: &str) {
     // Check if out_dir exists
 
     // Find jsp file
-    let jsp_file = std::fs::read_dir(out_dir).expect("Could not read directory");
+    let jsp_file =
+      std::fs::read_dir(out_dir).expect(&format!("Could not read directory {out_dir}"));
     let mut jsp_file_path = String::new();
     for file in jsp_file {
       let file = file.expect("Could not read file");

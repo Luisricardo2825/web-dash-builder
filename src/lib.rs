@@ -10,5 +10,5 @@ use crate::config_schema::ConfigSchema;
 pub use napi::Either;
 #[napi]
 pub fn build(arg: Option<Either<ConfigSchema, String>>) -> bool {
-  return builder::build(arg);
+  builder::build(arg)
 }

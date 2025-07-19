@@ -18,7 +18,7 @@ use crate::{
 };
 
 pub fn build(arg: Option<Either<ConfigSchema, String>>) -> bool {
-  return build_internal(arg);
+  build_internal(arg)
 }
 fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   let ConfigSchema {
@@ -40,7 +40,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
       }),
     }
   } else {
-    read_config_from_file("wdb.json".to_owned()).unwrap_or(ConfigSchema {
+    read_config_from_file("wdb.json").unwrap_or(ConfigSchema {
       src: Option::Some("./dist".to_owned()),
       out_dir: Option::Some("./SankhyaBuild".to_owned()),
       jsp: None,
@@ -56,26 +56,23 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
   let out_path = Path::new(&out_dir.unwrap()).to_path_buf();
   let src_path = Path::new(&src.unwrap()).to_path_buf();
   // Copy the whole build directory to dist
-  match copy_dir(&src_path, &out_path) {
-    Err(error) => {
-      if !src_path.exists() {
-        eprintln!(
-          "Could not find the build directory: {}",
-          &src_path.display()
-        );
-        return false;
-      }
-      if !out_path.exists() {
-        eprintln!(
-          "Could not find the output directory: {}",
-          &out_path.display()
-        );
-        return false;
-      }
-      eprintln!("Build failed: {}", error);
+  if let Err(error) = copy_dir(&src_path, &out_path) {
+    if !src_path.exists() {
+      eprintln!(
+        "Could not find the build directory: {}",
+        &src_path.display()
+      );
       return false;
     }
-    Ok(_) => {}
+    if !out_path.exists() {
+      eprintln!(
+        "Could not find the output directory: {}",
+        &out_path.display()
+      );
+      return false;
+    }
+    eprintln!("Build failed: {}", error);
+    return false;
   };
 
   // Treat JS files
@@ -138,7 +135,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
     return false;
   }
 
-  return true;
+  true
 }
 
 fn zip_dir(src_dir: &Path, zip_path: &Path) -> zip::result::ZipResult<()> {
@@ -172,7 +169,7 @@ fn zip_dir(src_dir: &Path, zip_path: &Path) -> zip::result::ZipResult<()> {
 fn parse_jsp(
   jsp: &Vec<Jsp>,
   file: &str,
-  out_path: &PathBuf,
+  out_path: &Path,
   default_headers: bool,
   base_folder: Option<String>,
 ) {
@@ -186,7 +183,7 @@ fn parse_jsp(
   // }
   let mut custom_jsp_content: Vec<String> = vec![];
   let mut custom_jsp_variables: Vec<String> = vec![];
-  let mut out_path = out_path.clone();
+  let mut out_path = out_path.to_path_buf();
   // Process JSP custom code
   process_custom_jsp(
     jsp,
@@ -199,7 +196,7 @@ fn parse_jsp(
   let mut entry_file_path = Path::new(file).to_path_buf();
   entry_file_path.set_extension("jsp");
   let entry_file = entry_file_path.file_name().unwrap().to_str().unwrap();
-  out_path.push(&entry_file);
+  out_path.push(entry_file);
 
   let path = Path::new(&out_path).to_path_buf();
 
@@ -237,7 +234,7 @@ fn process_jsp_file(
   base_folder: String,
 ) -> String {
   // Read html file
-  let mut html_content = match fs::read_to_string(&path) {
+  let mut html_content = match fs::read_to_string(path) {
     Ok(res) => res,
     Err(_) => {
       panic!(
@@ -283,9 +280,8 @@ fn process_jsp_file(
   html_content = replace_base_folder_var(&html_content, &base_folder);
 
   // Minify HTML
-  let html_minified = minify_code(html_content);
 
-  return html_minified;
+  minify_code(html_content)
 }
 
 fn replace_html_assets(html_content: String, base_folder: &str) -> String {
@@ -443,7 +439,7 @@ fn treat_asset_path<P: AsRef<Path>>(path: P, base_folder: Option<String>) -> boo
   let regex = Regex::new(r#"(?i)\s*('\.?\/[^']+\.(BMP|JPG|JPEG|GIF|PNG|WEBP|SVG)'|"\.?\/[^"]+\.(BMP|JPG|JPEG|GIF|PNG|WEBP|SVG)"|`\.?\/[^`]+\.(BMP|JPG|JPEG|GIF|PNG|WEBP|SVG)`)\s*"#).unwrap();
   let path_ = path.as_ref();
   let extension = path_.extension();
-  let mut content = match fs::read_to_string(&path_) {
+  let mut content = match fs::read_to_string(path_) {
     Ok(res) => res,
     Err(_) => {
       eprintln!("Could not find the file: {:?}", &path_);
@@ -454,7 +450,7 @@ fn treat_asset_path<P: AsRef<Path>>(path: P, base_folder: Option<String>) -> boo
   if extension.is_some() {
     let extension = extension.unwrap().to_str().unwrap().to_lowercase();
     let extension = extension.as_str();
-    let mut file = File::create(&path_).unwrap();
+    let mut file = File::create(path_).unwrap();
     if extension == "js" {
       let substitution = "(window.resolveAssetFullPath($1))";
       let result = regex.replace_all(&content, substitution);
@@ -463,7 +459,7 @@ fn treat_asset_path<P: AsRef<Path>>(path: P, base_folder: Option<String>) -> boo
       let cont = content.clone();
       let total_matchs = regex.captures_iter(&cont).count();
       let matchs = regex.captures_iter(&cont);
-      if total_matchs <= 0 {
+      if total_matchs == 0 {
         file.write_all(content.as_bytes()).unwrap();
         return true;
       }
@@ -489,7 +485,7 @@ fn treat_asset_path<P: AsRef<Path>>(path: P, base_folder: Option<String>) -> boo
       file.write_all(content.as_bytes()).unwrap();
     }
   }
-  return true;
+  true
 }
 
 fn treat_dyn_assets_path<P: AsRef<Path>>(path: P) -> bool {
@@ -499,7 +495,7 @@ fn treat_dyn_assets_path<P: AsRef<Path>>(path: P) -> bool {
     .unwrap();
   let path_ = path.as_ref();
   let extension = path_.extension();
-  let content = match fs::read_to_string(&path_) {
+  let content = match fs::read_to_string(path_) {
     Ok(res) => res,
     Err(_) => {
       eprintln!("Could not find the file: {:?}", &path_);
@@ -509,14 +505,14 @@ fn treat_dyn_assets_path<P: AsRef<Path>>(path: P) -> bool {
 
   if extension.is_some() {
     let extension = extension.unwrap().to_str().unwrap();
-    let mut file = File::create(&path_).unwrap();
+    let mut file = File::create(path_).unwrap();
     if extension == "js" {
       let substitution = "(window.resolveAsset($1))";
       let result = regex.replace_all(&content, substitution);
       file.write_all(result.as_bytes()).unwrap();
     }
   }
-  return true;
+  true
 }
 
 fn treat_html_esmodule<P: AsRef<Path>>(path: P) -> bool {
@@ -525,7 +521,7 @@ fn treat_html_esmodule<P: AsRef<Path>>(path: P) -> bool {
       .unwrap();
   let path_ = path.as_ref();
   let extension = path_.extension();
-  let content = match fs::read_to_string(&path_) {
+  let content = match fs::read_to_string(path_) {
     Ok(res) => res,
     Err(_) => {
       eprintln!("Could not find the file: {:?}", &path_);
@@ -537,7 +533,7 @@ fn treat_html_esmodule<P: AsRef<Path>>(path: P) -> bool {
     let extension = extension.unwrap().to_str().unwrap();
     let extension = extension.to_lowercase();
     let extension = extension.as_str();
-    let mut file = File::create(&path_).unwrap();
+    let mut file = File::create(path_).unwrap();
     if ["html", "jsp"].contains(&extension) {
       let substitution = r"$1$2$3./$${BASE_FOLDER}$4$5";
       let result = regex.replace_all(&content, substitution);
@@ -546,7 +542,7 @@ fn treat_html_esmodule<P: AsRef<Path>>(path: P) -> bool {
       file.write_all(content.as_bytes()).unwrap();
     }
   }
-  return true;
+  true
 }
 
 fn treat_wasm_asset_path<P: AsRef<Path>>(path: P) -> bool {
@@ -623,9 +619,8 @@ pub fn minify_code<S: AsRef<str>>(code: S) -> String {
   cfg.minify_doctype = true;
 
   let minified = minify(code, &cfg);
-  let minified = String::from_utf8(minified).unwrap();
 
-  minified
+  String::from_utf8(minified).unwrap()
 }
 
 pub fn remove_java_comments(code: &str) -> String {
@@ -635,9 +630,9 @@ pub fn remove_java_comments(code: &str) -> String {
   let mut in_single_line_comment = false;
   let mut in_multi_line_comment = false;
   let mut prev_char = '\0';
-  let mut chars = code.chars().peekable();
+  let chars = code.chars().peekable();
 
-  while let Some(c) = chars.next() {
+  for c in chars {
     if in_single_line_comment {
       if c == '\n' {
         in_single_line_comment = false;
