@@ -56,14 +56,18 @@ function runViteBuild(path) {
 
 function yarnInstall(path) {
   return new Promise((resolve, reject) => {
-    exec("yarn install --no-immutable", { cwd: path }, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Erro ao executar o comando: ${stderr}`);
-        reject(false);
-      } else {
-        resolve(true);
+    exec(
+      "yarn install --no-immutable",
+      { cwd: path },
+      (error, stdout, stderr) => {
+        if (error) {
+          console.error(`Erro ao executar o comando: ${stderr}`);
+          reject(false);
+        } else {
+          resolve(true);
+        }
       }
-    });
+    );
   });
 }
 
@@ -77,15 +81,14 @@ it.serial("Should build the tamplate", async (t) => {
 it("Should build and generate the outDir fine", (t) => {
   deleteFolder("./out");
   t.is(
-    build(
-      {
-        jsp: [],
-        src: path.join(PATH, PATH),
-        outDir: "./out",
-      }
-    ),
+    build({
+      jsp: [],
+      src: path.join(PATH, PATH),
+      outDir: "./out",
+    }),
     true
   );
+  deleteFolder("./out");
 });
 
 it("Should find the out dir", (t) => {

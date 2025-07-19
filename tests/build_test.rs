@@ -40,13 +40,13 @@ mod tests {
 
   #[test]
   fn test_wasm_build_with_config_file() {
-    let out_dir = "./out/snk";
+    let out_dir = "./out/snkOut";
 
     let build_result_2 = build(None);
 
     check_out_dir(out_dir);
 
-    let matches = get_jsp_imports(&Path::new("./out/snk/index.jsp"));
+    let matches = get_jsp_imports(&Path::new("./out/snkOut/index.jsp"));
     let matches = matches.join("\n");
     println!("{}", matches);
 
@@ -58,7 +58,7 @@ mod tests {
       regex::Regex::new(r"<%@\s*(page|taglib)\s*(import=)?(['][\w.\d*]*[']|[^<%@%>]*)?[^<%@%>]*%>");
 
     // Get all matchs
-    let content = std::fs::read_to_string(path).expect("Could not read file");
+    let content = std::fs::read_to_string(path).expect(&format!("Could not read file {path:?}"));
     let mut matches = Vec::new();
     for cap in regex.unwrap().captures_iter(&content) {
       matches.push(cap.get(0).unwrap().as_str().to_string());
@@ -68,6 +68,8 @@ mod tests {
   }
 
   fn check_out_dir(out_dir: &str) {
+    // Check if out_dir exists
+
     // Find jsp file
     let jsp_file = std::fs::read_dir(out_dir).expect("Could not read directory");
     let mut jsp_file_path = String::new();

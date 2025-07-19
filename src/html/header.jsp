@@ -19,3 +19,8 @@
     }
     jdbcWrapper.closeSession();
 %>
+
+<%
+    String baseFolder = ((String) request.getAttribute("BASE_FOLDER"));
+    baseFolder = baseFolder.replace("\\", "/");
+%>

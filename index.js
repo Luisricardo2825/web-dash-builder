@@ -1,13 +1,12 @@
 #!/usr/bin/env node
 /// <reference path="./index.d.ts" />
 
-import { build as build$1 } from "./main.cjs";
+import { build } from "./main.cjs";
 import { networkInterfaces } from "os";
 import { mkdir, writeFile } from "fs";
 import path from "path";
 
 /** @type {import("./index.d.ts").build}  */
-const build = build$1;
 function getIP() {
   const nets = networkInterfaces();
   const results = Object.create(null);
