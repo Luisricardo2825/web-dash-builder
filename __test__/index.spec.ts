@@ -6,12 +6,7 @@ import { exec } from "child_process";
 import path from "path";
 const PATH = "./dist";
 const dirExist = (dir: string) => {
-  try {
-    fs.accessSync(dir, fs.constants.R_OK);
-    return true;
-  } catch (e) {
-    return false;
-  }
+  return fs.existsSync(dir);
 };
 
 // delete folder
@@ -31,15 +26,11 @@ function deleteFolder(folderPath: string) {
 
 function runViteBuild(path: string) {
   // Run vite build e "path"
-  return new Promise(async (resolve, reject) => {
-    try {
-      await vite_build({ root: path, logLevel: "silent" });
-      resolve(true);
-    } catch (e) {
+  return new Promise((resolve, reject) => {
+    vite_build({ root: path, logLevel: "silent" }).then(() => resolve(true)).catch((e) => {
       console.log(e);
       reject(false);
-    }
-    // if error
+    })
   });
 }
 

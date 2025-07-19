@@ -554,7 +554,7 @@ fn treat_wasm_asset_path<P: AsRef<Path>>(path: P) -> bool {
     Regex::new(r#"(?s)(<script[^>]*>.*?)(['"`][^'"`]+\.wasm['"`])(.*?<\/script>)"#).unwrap();
   let path_ = path.as_ref();
   let extension = path_.extension();
-  let content = match fs::read_to_string(&path_) {
+  let content = match fs::read_to_string(path_) {
     Ok(res) => res,
     Err(_) => {
       eprintln!("Could not find the file: {:?}", &path_);
@@ -564,13 +564,13 @@ fn treat_wasm_asset_path<P: AsRef<Path>>(path: P) -> bool {
 
   if extension.is_some() {
     let extension = extension.unwrap().to_str().unwrap();
-    let mut file = File::create(&path_).unwrap();
+    let mut file = File::create(path_).unwrap();
     if ["html", "jsp"].contains(&extension) {
       let result = regex.replace_all(&content, |caps: &regex::Captures| {
         format!(
           "{}{}{}",
           &caps[1],
-          format!("window.getAsURL({})", &caps[2]),
+          format_args!("window.getAsURL({})", &caps[2]),
           &caps[3]
         )
       });
@@ -579,14 +579,14 @@ fn treat_wasm_asset_path<P: AsRef<Path>>(path: P) -> bool {
       file.write_all(content.as_bytes()).unwrap();
     }
   }
-  return true;
+  true
 }
 
 fn treat_wasm_js_asset_path<P: AsRef<Path>>(path: P) -> bool {
   let regex = Regex::new(r#"(?s)[^URL(](['"`][^'"`]+\.wasm['"`])"#).unwrap();
   let path_ = path.as_ref();
   let extension = path_.extension();
-  let content = match fs::read_to_string(&path_) {
+  let content = match fs::read_to_string(path_) {
     Ok(res) => res,
     Err(_) => {
       eprintln!("Could not find the file: {:?}", &path_);
@@ -596,14 +596,14 @@ fn treat_wasm_js_asset_path<P: AsRef<Path>>(path: P) -> bool {
 
   if extension.is_some() {
     let extension = extension.unwrap().to_str().unwrap();
-    let mut file = File::create(&path_).unwrap();
+    let mut file = File::create(path_).unwrap();
     if extension == "js" {
       let substitution = "window.getAsURL($0)";
       let result = regex.replace_all(&content, substitution);
       file.write_all(result.as_bytes()).unwrap();
     }
   }
-  return true;
+  true
 }
 
 pub fn minify_code<S: AsRef<str>>(code: S) -> String {
@@ -624,7 +624,8 @@ pub fn minify_code<S: AsRef<str>>(code: S) -> String {
 
   let minified = minify(code, &cfg);
   let minified = String::from_utf8(minified).unwrap();
-  return minified;
+
+  minified
 }
 
 pub fn remove_java_comments(code: &str) -> String {
