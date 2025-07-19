@@ -1,26 +1,26 @@
-[package]
-edition = "2021"
-name = "web-dash-builder"
-version = "0.0.0"
 
+[package]
+authors = ["LongYinan <lynweklm@gmail.com>"]
+edition = "2021"
+name    = "web_dash_builder"
+version = "0.1.0"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
-path = "src/lib.rs"
 
 [dependencies]
-# Default enable napi4 feature, see https://nodejs.org/api/n-api.html#node-api-version-matrix
-napi = { version = "2.16.13", default-features = false, features = ["napi4"] }
-napi-derive = "2.16.13"
-regex = "1.11.1"
-serde = { version = "1.0.217", features = ["derive"] }
-serde_json = "1.0.137"
-zip = "4.3.0"
-walkdir = "2.4"
 minify-html = "0.16.4"
+napi        = "3.0.0"
+napi-derive = "3.0.0"
+regex       = "1.11.1"
+serde       = { version = "1.0.217", features = ["derive"] }
+serde_json  = "1.0.137"
+walkdir     = "2.4"
+zip         = "4.3.0"
 
 [build-dependencies]
-napi-build = "2.1.4"
+napi-build = "2"
 
 [profile.release]
-lto = true
+lto   = true
+strip = "symbols"

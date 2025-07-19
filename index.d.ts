@@ -1,11 +1,11 @@
 import type { ConfigSchema } from "./main";
-import type { PluginOption } from "vite";
+import type { Plugin, PluginOption } from "vite";
 export interface Options {
   devConfig?: ConfigSchema;
   prodConfig?: ConfigSchema;
 }
 
-export declare function plugin(options?: Options): PluginOption[];
+export declare function plugin(options?: Options): Plugin[];
 
 export function build(options?: ConfigSchema, entryFile?: string): boolean;
 export declare interface Window {

@@ -5,7 +5,7 @@ import { build as vite_build } from "vite";
 import { exec } from "child_process";
 import path from "path";
 const PATH = "./dist";
-const dirExist = (dir) => {
+const dirExist = (dir: string) => {
   try {
     fs.accessSync(dir, fs.constants.R_OK);
     return true;
@@ -14,19 +14,8 @@ const dirExist = (dir) => {
   }
 };
 
-function downloadRepo(repoUrl, destination) {
-  return new Promise((resolve, reject) => {
-    exec(`git clone ${repoUrl} ${destination}`, (error, stdout, stderr) => {
-      if (error) {
-        reject(false);
-      } else {
-        resolve(true);
-      }
-    });
-  });
-}
 // delete folder
-function deleteFolder(folderPath) {
+function deleteFolder(folderPath: string) {
   if (fs.existsSync(folderPath)) {
     fs.readdirSync(folderPath).forEach((file) => {
       const filePath = `${folderPath}/${file}`;
@@ -40,7 +29,7 @@ function deleteFolder(folderPath) {
   }
 }
 
-function runViteBuild(path) {
+function runViteBuild(path: string) {
   // Run vite build e "path"
   return new Promise(async (resolve, reject) => {
     try {
@@ -54,12 +43,12 @@ function runViteBuild(path) {
   });
 }
 
-function yarnInstall(path) {
+function yarnInstall(path: string) {
   return new Promise((resolve, reject) => {
     exec(
       "yarn install --no-immutable",
       { cwd: path },
-      (error, stdout, stderr) => {
+      (error, _, stderr) => {
         if (error) {
           console.error(`Erro ao executar o comando: ${stderr}`);
           reject(false);
@@ -103,6 +92,7 @@ it("Should run plugin and return an array with one position only", (t) => {
   const a = plugin();
   const size = a.length == 1;
   const typeOfRet = Array.isArray(a);
+
   const { name } = a[0];
   t.is(typeOfRet, true, "The return is not a array");
   t.is(size, true, "The size is not equal to: 1");
