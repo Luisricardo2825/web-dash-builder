@@ -1,6 +1,6 @@
 {
   "name": "web-dash-builder",
-  "version": "0.0.44",
+  "version": "0.0.45",
   "description": "Template project for writing node package with napi-rs",
   "main": "index.js",
   "repository": {
