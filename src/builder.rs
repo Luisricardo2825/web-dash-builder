@@ -71,7 +71,7 @@ fn build_internal(arg: Option<Either<ConfigSchema, String>>) -> bool {
       );
       return false;
     }
-    eprintln!("Build failed: {}", error);
+    eprintln!("Build failed: {error}");
     return false;
   };
 
@@ -287,7 +287,7 @@ fn process_jsp_file(
 fn replace_html_assets(html_content: String, base_folder: &str) -> String {
   let regex = Regex::new(r#"([\w\S]*)\=(\"|')(\.?\/+[\w\s\#\/\-\.]+)(\"|')"#).unwrap();
   let mut substitution = "$1=\"$${BASE_FOLDER}$3\"";
-  let subs = format!("$1=\"{}$3\"", base_folder);
+  let subs = format!("$1=\"{base_folder}$3\"");
 
   // replace with base_folder
   let mut html_content = html_content;
@@ -369,12 +369,12 @@ fn process_custom_jsp(
           }
         };
         let var_name = ele.var_name.as_ref().unwrap();
-        custom_jsp_variables.push(format!("var {}={};", var_name, code));
+        custom_jsp_variables.push(format!("var {var_name}={code};"));
       }
       if code.is_some() {
         let code = ele.code.as_ref().unwrap().to_owned();
         let var_name = ele.var_name.as_ref().unwrap();
-        custom_jsp_variables.push(format!("var {}={};", var_name, code));
+        custom_jsp_variables.push(format!("var {var_name}={code};"));
       }
     }
   }
