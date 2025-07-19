@@ -22,7 +22,9 @@
   ],
   "files": [
     "index.d.ts",
-    "index.js"
+    "index.js",
+    "main.cjs",
+    "main.d.ts"
   ],
   "napi": {
     "binaryName": "web-dash-builder",
