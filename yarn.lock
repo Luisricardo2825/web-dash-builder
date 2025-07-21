@@ -4074,6 +4074,9 @@ __metadata:
     tinybench: "npm:^4.0.1"
     typescript: "npm:^5.8.3"
     vite: "npm:7.0.5"
+  bin:
+    wdb: ./index.js
+    web-dash-builder: ./index.js
   languageName: unknown
   linkType: soft
 

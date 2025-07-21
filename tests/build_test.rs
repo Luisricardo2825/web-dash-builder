@@ -39,6 +39,20 @@ mod tests {
   }
 
   #[test]
+  fn test_dev_build() {
+    let out_dir = "./out/dev";
+
+    let build_result_2 = build(Some(Either::A(ConfigSchema {
+      out_dir: Some(out_dir.to_owned()),
+      src: Some("./pkgs/dev".to_string()),
+      ..Default::default()
+    })));
+
+    check_out_dir(out_dir);
+
+    assert!(build_result_2)
+  }
+  #[test]
   fn test_wasm_build_with_config_file() {
     let out_dir = "./out/snkOut";
 

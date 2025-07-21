@@ -623,52 +623,61 @@ pub fn minify_code<S: AsRef<str>>(code: S) -> String {
   String::from_utf8(minified).unwrap()
 }
 
-pub fn remove_java_comments(code: &str) -> String {
-  let mut result = String::new();
+pub fn remove_java_comments(input: &str) -> String {
+  let mut result = String::with_capacity(input.len());
+
+  let mut chars = input.chars().peekable();
   let mut in_string = false;
-  let mut in_char = false;
-  let mut in_single_line_comment = false;
-  let mut in_multi_line_comment = false;
-  let mut prev_char = '\0';
-  let chars = code.chars().peekable();
+  let mut string_delim = '\0';
 
-  for c in chars {
-    if in_single_line_comment {
-      if c == '\n' {
-        in_single_line_comment = false;
-        result.push(c);
+  while let Some(c) = chars.next() {
+    if in_string {
+      // Fechamento de string
+      result.push(c);
+      if c == '\\' {
+        // Escapa o próximo caractere
+        if let Some(next) = chars.next() {
+          result.push(next);
+        }
+      } else if c == string_delim {
+        in_string = false;
       }
-      continue;
-    }
-
-    if in_multi_line_comment {
-      if prev_char == '*' && c == '/' {
-        in_multi_line_comment = false;
+    } else {
+      match c {
+        '"' | '\'' => {
+          in_string = true;
+          string_delim = c;
+          result.push(c);
+        }
+        '/' => match chars.peek() {
+          Some('/') => {
+            // Comentário de linha
+            while let Some(nc) = chars.next() {
+              if nc == '\n' {
+                result.push('\n');
+                break;
+              }
+            }
+          }
+          Some('*') => {
+            // Comentário de bloco
+            chars.next(); // Consome '*'
+            while let Some(nc) = chars.next() {
+              if nc == '*' {
+                if let Some('/') = chars.peek() {
+                  chars.next(); // Consome '/'
+                  break;
+                }
+              }
+            }
+          }
+          _ => {
+            result.push(c);
+          }
+        },
+        _ => result.push(c),
       }
-      prev_char = c;
-      continue;
     }
-
-    if !in_string && !in_char {
-      if prev_char == '/' && c == '/' {
-        in_single_line_comment = true;
-        result.pop(); // Remove o '/'
-        continue;
-      } else if prev_char == '/' && c == '*' {
-        in_multi_line_comment = true;
-        result.pop(); // Remove o '/'
-        continue;
-      }
-    }
-
-    if c == '"' && prev_char != '\\' {
-      in_string = !in_string;
-    } else if c == '\'' && prev_char != '\\' {
-      in_char = !in_char;
-    }
-
-    result.push(c);
-    prev_char = c;
   }
 
   result
