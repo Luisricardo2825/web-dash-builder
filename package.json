@@ -1,6 +1,6 @@
 {
   "name": "web-dash-builder",
-  "version": "0.0.47",
+  "version": "0.0.48",
   "description": "CLI for dash building",
   "main": "index.js",
   "repository": {
